@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lotex Depot — Affiliate Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root {
+    --black: #000;
+    --black2: #0a0a0a;
+    --card: #0f0f0f;
+    --card2: #141414;
+    --gold: #FFD700;
+    --orange: #FF6B00;
+    --red: #CC2200;
+    --green: #22c55e;
+    --text: #e8e8e8;
+    --muted: #666;
+    --border: rgba(255,107,0,0.15);
+    --glow: 0 0 24px rgba(255,107,0,0.2);
+    --glow-gold: 0 0 24px rgba(255,215,0,0.2);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--black);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* ===== LOGIN ===== */
+  #login-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+
+  .login-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 52px 44px;
+    width: 420px;
+    box-shadow: var(--glow);
+    animation: fadeUp 0.4s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .login-logo {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 32px;
+    color: var(--gold);
+    text-shadow: var(--glow-gold);
+    letter-spacing: 4px;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  .login-tag {
+    text-align: center;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--orange);
+    text-transform: uppercase;
+    margin-bottom: 36px;
+    font-weight: 600;
+  }
+
+  .fld { margin-bottom: 16px; }
+
+  .fld label {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+
+  .fld input {
+    width: 100%;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    color: var(--text);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .fld input:focus { border-color: var(--orange); box-shadow: 0 0 0 2px rgba(255,107,0,0.1); }
+
+  .btn-orange {
+    width: 100%;
+    background: var(--orange);
+    border: none;
+    color: #000;
+    padding: 15px;
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+    box-shadow: var(--glow);
+  }
+
+  .btn-orange:hover { background: var(--gold); }
+  .btn-orange:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .login-err {
+    background: rgba(204,34,0,0.1);
+    border: 1px solid rgba(204,34,0,0.3);
+    color: var(--red);
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    margin-bottom: 14px;
+    display: none;
+  }
+
+  .login-back {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .login-back a {
+    color: var(--orange);
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  /* ===== PENDING SCREEN ===== */
+  #pending-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--black);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9998;
+  }
+
+  .pending-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 52px 44px;
+    width: 460px;
+    text-align: center;
+    box-shadow: var(--glow);
+  }
+
+  .pending-icon { font-size: 56px; margin-bottom: 20px; }
+
+  .pending-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 36px;
+    color: var(--gold);
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+  }
+
+  .pending-sub {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+
+  /* ===== SIDEBAR ===== */
+  #app { display: none; width: 100%; }
+
+  .sidebar {
+    width: 240px;
+    min-height: 100vh;
+    background: #050505;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 100;
+  }
+
+  .sidebar-brand {
+    padding: 24px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .brand-logo {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 20px;
+    color: var(--gold);
+    letter-spacing: 3px;
+    text-shadow: var(--glow-gold);
+  }
+
+  .brand-tag {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--orange);
+    text-transform: uppercase;
+    background: rgba(255,107,0,0.1);
+    padding: 2px 8px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-top: 4px;
+  }
+
+  .brand-user {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .nav-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    padding: 18px 20px 6px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 20px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-left: 2px solid transparent;
+  }
+
+  .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+  .nav-item.active { color: var(--gold); border-left-color: var(--orange); background: rgba(255,107,0,0.05); }
+  .nav-item .icon { font-size: 15px; width: 18px; text-align: center; }
+
+  .sidebar-bottom {
+    margin-top: auto;
+    padding: 18px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .logout-btn {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 9px;
+    border-radius: 6px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .logout-btn:hover { border-color: var(--red); color: var(--red); }
+
+  /* ===== MAIN ===== */
+  .main {
+    margin-left: 240px;
+    flex: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topbar {
+    background: #050505;
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .topbar-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 20px;
+    color: var(--text);
+    letter-spacing: 3px;
+  }
+
+  .store-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--orange);
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .store-link:hover { color: var(--gold); }
+
+  .content { padding: 32px; flex: 1; }
+
+  /* ===== PAGES ===== */
+  .page { display: none; animation: fadeIn 0.3s ease; }
+  .page.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .page-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 38px;
+    color: var(--text);
+    letter-spacing: 3px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .page-sub {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  /* ===== STATS ===== */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--orange), var(--gold));
+    transform: scaleX(0);
+    transition: transform 0.3s;
+  }
+
+  .stat-card:hover::before { transform: scaleX(1); }
+  .stat-card:hover { border-color: rgba(255,107,0,0.4); }
+
+  .stat-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .stat-val {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 36px;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-sub { font-size: 11px; color: var(--muted); }
+  .stat-sub.up { color: var(--green); }
+  .stat-sub.warn { color: var(--orange); }
+
+  /* ===== AFFILIATE LINK BOX ===== */
+  .link-box {
+    background: var(--card);
+    border: 1px solid rgba(255,107,0,0.35);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 0 40px rgba(255,107,0,0.08);
+    position: relative;
+  }
+
+  .link-box::before {
+    content: '';
+    position: absolute;
+    right: -40px; top: -40px;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, rgba(255,215,0,0.06) 0%, transparent 65%);
+  }
+
+  .link-icon { font-size: 32px; flex-shrink: 0; }
+
+  .link-info { flex: 1; min-width: 0; }
+
+  .link-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--orange);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+
+  .link-url {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--gold);
+    background: var(--card2);
+    padding: 10px 16px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .link-hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  .copy-btn {
+    background: var(--orange);
+    border: none;
+    color: #000;
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+  }
+
+  .copy-btn:hover { background: var(--gold); }
+
+  /* ===== CARD ===== */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .card-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 20px;
+    color: var(--text);
+    letter-spacing: 2px;
+  }
+
+  /* ===== TABLE ===== */
+  .tbl-wrap { overflow-x: auto; }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  th {
+    text-align: left;
+    padding: 11px 24px;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    background: var(--card2);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 15px 24px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,107,0,0.02); }
+
+  /* ===== PILLS ===== */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .pill.green { background: rgba(34,197,94,0.12); color: var(--green); }
+  .pill.orange { background: rgba(255,107,0,0.12); color: var(--orange); }
+  .pill.gold { background: rgba(255,215,0,0.12); color: var(--gold); }
+  .pill.red { background: rgba(204,34,0,0.12); color: var(--red); }
+  .pill.muted { background: rgba(255,255,255,0.06); color: var(--muted); }
+
+  /* ===== WITHDRAW PAGE ===== */
+  .balance-hero {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .balance-hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: 50%;
+    transform: translateX(-50%);
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(255,215,0,0.06) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .bal-label {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .bal-val {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 72px;
+    color: var(--gold);
+    text-shadow: var(--glow-gold);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .bal-sub { font-size: 12px; color: var(--muted); }
+
+  .withdraw-form {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+  }
+
+  .form-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 22px;
+    color: var(--text);
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+  }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .form-grid-1 { margin-bottom: 16px; }
+
+  .ff label {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+
+  .ff input, .ff select {
+    width: 100%;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .ff input:focus, .ff select:focus {
+    border-color: var(--orange);
+    box-shadow: 0 0 0 2px rgba(255,107,0,0.1);
+  }
+
+  .ff select option { background: #1a1a1a; }
+
+  .btn-submit {
+    background: var(--orange);
+    border: none;
+    color: #000;
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: var(--glow);
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .btn-submit:hover { background: var(--gold); }
+  .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .withdraw-err {
+    background: rgba(204,34,0,0.1);
+    border: 1px solid rgba(204,34,0,0.3);
+    color: var(--red);
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    margin-bottom: 14px;
+    display: none;
+  }
+
+  /* ===== PROFILE PAGE ===== */
+  .profile-form {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    max-width: 560px;
+    margin-bottom: 24px;
+  }
+
+  /* ===== LOADING & EMPTY ===== */
+  .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 56px;
+    color: var(--muted);
+    gap: 12px;
+    font-size: 13px;
+  }
+
+  .spinner {
+    width: 20px; height: 20px;
+    border: 2px solid var(--border);
+    border-top-color: var(--orange);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty-state {
+    padding: 48px;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-state p { font-size: 13px; }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: 28px; right: 28px;
+    padding: 14px 22px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 99999;
+    transform: translateX(120%);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-width: 300px;
+  }
+
+  .toast.show { transform: translateX(0); }
+  .toast.success { background: var(--card); border: 1px solid rgba(34,197,94,0.4); color: var(--green); }
+  .toast.error { background: var(--card); border: 1px solid rgba(204,34,0,0.4); color: var(--red); }
+  .toast.info { background: var(--card); border: 1px solid var(--border); color: var(--orange); }
+
+  /* ===== GRID 2 ===== */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .code-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--orange);
+    background: rgba(255,107,0,0.08);
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">LOTEX DEPOT</div>
+    <div class="login-tag">🔗 Affiliate Portal</div>
+    <div id="login-err" class="login-err"></div>
+    <div class="fld">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="your@email.com" autocomplete="email">
+    </div>
+    <div class="fld">
+      <label>Password</label>
+      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn-orange" id="login-btn" onclick="doLogin()">ACCESS DASHBOARD</button>
+    <div class="login-back">
+      Not an affiliate yet? <a href="lotex-website.html">Apply here →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PENDING SCREEN ===== -->
+<div id="pending-screen">
+  <div class="pending-box">
+    <div class="pending-icon">⏳</div>
+    <div class="pending-title">APPLICATION PENDING</div>
+    <div class="pending-sub">
+      Your affiliate application has been submitted and is currently under review by the Lotex Depot admin.<br><br>
+      You'll be able to access your dashboard once you're approved. This usually takes <strong style="color:var(--gold);">24–48 hours</strong>.
+    </div>
+    <button class="btn-orange" onclick="doLogout()" style="width:auto; padding:12px 28px;">SIGN OUT</button>
+  </div>
+</div>
+
+<!-- ===== APP ===== -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">LOTEX DEPOT</div>
+      <div class="brand-tag">AFFILIATE</div>
+      <div class="brand-user" id="sidebar-name">Loading...</div>
+    </div>
+
+    <div class="nav-label">Menu</div>
+    <div class="nav-item active" onclick="showPage('dashboard', this)">
+      <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span> Dashboard
+    </div>
+    <div class="nav-item" onclick="showPage('sales', this)">
+      <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span> My Sales
+    </div>
+    <div class="nav-item" onclick="showPage('commissions', this)">
+      <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span> Commissions
+    </div>
+    <div class="nav-item" onclick="showPage('withdraw', this)">
+      <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span> Withdraw
+    </div>
+    <div class="nav-item" onclick="showPage('leaderboard', this)">
+      <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span> Leaderboard
+    </div>
+    <div class="nav-label">Account</div>
+    <div class="nav-item" onclick="showPage('profile', this)">
+      <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Profile
+    </div>
+    <div class="nav-item" onclick="showPage('products', this)">
+      <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span> Products
+      <span class="nav-badge" id="new-products-badge" style="display:none;">NEW</span>
+    </div>
+    <div class="nav-item" onclick="window.open('lotex-website.html','_blank')">
+      <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span> View Store
+    </div>
+
+    <div class="sidebar-bottom">
+      <button class="logout-btn" onclick="doLogout()">SIGN OUT</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button onclick="refreshCurrentPage()" title="Refresh" style="background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:8px 14px; color:var(--muted); cursor:pointer; display:flex; align-items:center; gap:6px; font-family:'Montserrat',sans-serif; font-size:11px; font-weight:700; letter-spacing:1px; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+          <svg id="refresh-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          REFRESH
+        </button>
+        <a class="store-link" href="lotex-website.html" target="_blank">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          View Store
+        </a>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ====== DASHBOARD ====== -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-title">DASHBOARD</div>
+        <div class="page-sub" id="dash-welcome">Welcome back</div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total Sales</div>
+            <div class="stat-val" id="stat-sales">—</div>
+            <div class="stat-sub up" id="stat-sales-sub">Orders via your link</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Earned</div>
+            <div class="stat-val" id="stat-earned" style="font-size:26px;">—</div>
+            <div class="stat-sub">All time commission</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Available to Withdraw</div>
+            <div class="stat-val" id="stat-available" style="font-size:26px; color:var(--green);">—</div>
+            <div class="stat-sub warn" id="stat-avail-sub">Ready to cash out</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Pending Commission</div>
+            <div class="stat-val" id="stat-pending" style="font-size:26px; color:var(--orange);">—</div>
+            <div class="stat-sub">Unlocks when orders deliver</div>
+          </div>
+        </div>
+
+        <!-- LINK BOX -->
+        <div class="link-box">
+          <div class="link-icon">🔗</div>
+          <div class="link-info">
+            <div class="link-label">Your Unique Affiliate Link</div>
+            <div class="link-url" id="aff-link-display">Loading your link...</div>
+            <div class="link-hint">Share this link anywhere. Every purchase made through it earns you commission.</div>
+          </div>
+          <button class="copy-btn" onclick="(function(){var el=document.createElement('textarea');el.value=document.getElementById('aff-link-display').textContent;document.body.appendChild(el);el.select();document.execCommand('copy');document.body.removeChild(el);var b=document.querySelector('.copy-btn');b.textContent='✓ COPIED!';setTimeout(function(){b.textContent='COPY LINK';},2000);})()">COPY LINK</button>
+        </div>
+
+        <!-- RECENT SALES -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">RECENT SALES</div>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr><th>Order</th><th>Date</th><th>Amount</th><th>Commission</th><th>Status</th></tr>
+              </thead>
+              <tbody id="dash-sales-tbody">
+                <tr><td colspan="5"><div class="loading"><div class="spinner"></div>Loading...</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== SALES ====== -->
+      <div class="page" id="page-sales">
+        <div class="page-title">MY SALES</div>
+        <div class="page-sub">All orders placed through your affiliate link</div>
+
+        <div class="card">
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Items</th><th>Sale Amount</th><th>Commission</th><th>Status</th></tr>
+              </thead>
+              <tbody id="sales-tbody">
+                <tr><td colspan="7"><div class="loading"><div class="spinner"></div>Loading...</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== COMMISSIONS ====== -->
+      <div class="page" id="page-commissions">
+        <div class="page-title">COMMISSIONS</div>
+        <div class="page-sub">Earnings breakdown</div>
+
+        <div class="grid-2" style="margin-bottom:24px;">
+          <div class="stat-card">
+            <div class="stat-label">Total Earned (All Time)</div>
+            <div class="stat-val" id="comm-total" style="font-size:28px;">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Paid Out</div>
+            <div class="stat-val" id="comm-paid" style="font-size:28px; color:var(--green);">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Available to Withdraw</div>
+            <div class="stat-val" id="comm-available" style="font-size:28px; color:var(--orange);">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Pending (Processing)</div>
+            <div class="stat-val" id="comm-pending" style="font-size:28px; color:var(--muted);">—</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">COMMISSION HISTORY</div></div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr><th>Order</th><th>Date</th><th>Amount</th><th>Status</th></tr>
+              </thead>
+              <tbody id="comm-tbody">
+                <tr><td colspan="4"><div class="loading"><div class="spinner"></div>Loading...</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PRODUCTS ===== -->
+      <div class="page" id="page-products">
+        <div style="padding:28px 0 16px;">
+          <div style="font-family:'Bebas Neue',cursive;font-size:28px;letter-spacing:3px;">PRODUCTS</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;">All active products — your commission per sale</div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px;" id="aff-products-grid">
+          <div class="loading"><div class="spinner"></div>Loading...</div>
+        </div>
+      </div>
+
+      <!-- ===== LEADERBOARD ===== -->
+      <div class="page" id="page-leaderboard">
+        <div style="padding:28px 0 16px;">
+          <div style="font-family:'Bebas Neue',cursive;font-size:28px;letter-spacing:3px;">🏆 LEADERBOARD</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;">Top affiliates ranked by total earnings</div>
+        </div>
+        <div id="aff-leaderboard-content">
+          <div class="loading"><div class="spinner"></div>Loading...</div>
+        </div>
+      </div>
+
+      <!-- ====== WITHDRAW ====== -->
+      <div class="page" id="page-withdraw">
+        <div class="page-title">WITHDRAW</div>
+        <div class="page-sub">Request your earnings payout</div>
+
+        <div class="balance-hero">
+          <div class="bal-label">Available Balance</div>
+          <div class="bal-val" id="wd-balance">—</div>
+          <div class="bal-sub">Ready to withdraw via M-Pesa</div>
+        </div>
+
+        <div class="withdraw-form">
+          <div class="form-title">REQUEST WITHDRAWAL</div>
+          <div id="wd-err" class="withdraw-err"></div>
+
+          <div class="form-grid">
+            <div class="ff">
+              <label>Amount (KES)</label>
+              <input type="number" id="wd-amount" placeholder="e.g. 2000">
+            </div>
+            <div class="ff">
+              <label>Payout Method</label>
+              <select id="wd-method">
+                <option value="mpesa">M-Pesa</option>
+                <option value="bank">Bank Transfer</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid-1 ff">
+            <label>M-Pesa Number</label>
+            <input type="tel" id="wd-mpesa" placeholder="+254 7XX XXX XXX">
+          </div>
+
+          <button class="btn-submit" id="wd-btn" onclick="requestWithdrawal()">REQUEST WITHDRAWAL</button>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">WITHDRAWAL HISTORY</div></div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr><th>Date</th><th>Amount</th><th>Method</th><th>Number</th><th>Status</th></tr>
+              </thead>
+              <tbody id="wd-history-tbody">
+                <tr><td colspan="5"><div class="loading"><div class="spinner"></div>Loading...</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== PROFILE ====== -->
+      <div class="page" id="page-profile">
+        <div class="page-title">PROFILE</div>
+        <div class="page-sub">Your affiliate account details</div>
+
+        <div class="profile-form">
+          <div class="form-grid">
+            <div class="ff">
+              <label>Full Name</label>
+              <input id="prof-name" placeholder="Your full name">
+            </div>
+            <div class="ff">
+              <label>Email</label>
+              <input id="prof-email" placeholder="you@email.com" disabled style="opacity:0.5;">
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="ff">
+              <label>Phone</label>
+              <input id="prof-phone" placeholder="+254...">
+            </div>
+            <div class="ff">
+              <label>Affiliate Code</label>
+              <input id="prof-code" readonly style="color:var(--orange); cursor:default;">
+            </div>
+          </div>
+          <div class="ff" style="margin-bottom:20px;">
+            <label>Affiliate Status</label>
+            <input id="prof-status" readonly style="cursor:default;">
+          </div>
+          <button class="btn-submit" style="width:auto; padding:12px 28px;" onclick="saveProfile()">SAVE CHANGES</button>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== SUPABASE =====
+const { createClient } = supabase;
+const sb = createClient(
+  'https://myewthmcvhioswmmnbqp.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15ZXd0aG1jdmhpb3N3bW1uYnFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMDg4MDksImV4cCI6MjA4Nzg4NDgwOX0.M-Bxdlo6ijSBFIfV3kJg6QBDrIyZMSS0Hp0-f7CweoQ'
+);
+
+// ===== STATE =====
+let currentUser = null;
+let affiliateData = null;
+let affiliateLink = '';
+
+// ===== TOAST =====
+let toastTimer;
+function toast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ===== AUTH =====
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const btn = document.getElementById('login-btn');
+  const errEl = document.getElementById('login-err');
+
+  errEl.style.display = 'none';
+  if (!email || !pass) { errEl.textContent = 'Fill in all fields'; errEl.style.display = 'block'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'SIGNING IN...';
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+
+  if (error) {
+    errEl.textContent = error.message;
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'ACCESS DASHBOARD';
+    return;
+  }
+
+  currentUser = data.user;
+  await loadAffiliate();
+}
+
+async function loadAffiliate() {
+  // Get affiliate record
+  const { data: aff } = await sb.from('affiliates')
+    .select('*, profiles(full_name, email, phone)')
+    .eq('user_id', currentUser.id)
+    .single();
+
+  if (!aff) {
+    // Not an affiliate at all
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('pending-screen').style.display = 'flex';
+    return;
+  }
+
+  affiliateData = aff;
+
+  if (aff.status === 'pending') {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('pending-screen').style.display = 'flex';
+    return;
+  }
+
+  if (aff.status === 'rejected') {
+    document.getElementById('login-err').textContent = 'Your application was not approved. Contact Lotex Depot for more info.';
+    document.getElementById('login-err').style.display = 'block';
+    document.getElementById('login-btn').disabled = false;
+    document.getElementById('login-btn').textContent = 'ACCESS DASHBOARD';
+    await sb.auth.signOut();
+    return;
+  }
+
+  // APPROVED — show dashboard
+  const name = aff.profiles?.full_name || currentUser.email.split('@')[0];
+  // Use current origin if hosted, otherwise show a placeholder for localhost
+  let affiliateLinkBase;
+  if (window.location.protocol === 'file:') {
+    // Local testing - show a placeholder so they know it'll work when hosted
+    affiliateLinkBase = 'https://YOUR-GITHUB.github.io/lotex-depot/lotex-website.html';
+  } else {
+    // Hosted - automatically use current domain and path
+    const path = window.location.pathname.replace('lotex-affiliate.html', 'lotex-website.html');
+    affiliateLinkBase = window.location.origin + path;
+  }
+  affiliateLink = `${affiliateLinkBase}?ref=${aff.affiliate_code}`;
+
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('sidebar-name').textContent = name;
+  document.getElementById('aff-link-display').textContent = affiliateLink;
+  document.getElementById('dash-welcome').textContent = `Welcome back, ${name}`;
+
+  loadDashboard();
+}
+
+async function doLogout() {
+  await sb.auth.signOut();
+  currentUser = null;
+  affiliateData = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('pending-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-pass').value = '';
+}
+
+// Check session on load
+window.addEventListener('load', async () => {
+  const { data } = await sb.auth.getSession();
+  if (data.session) {
+    currentUser = data.session.user;
+    await loadAffiliate();
+  }
+});
+
+document.getElementById('login-pass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+// ===== NAVIGATION =====
+function showPage(name, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+  document.getElementById('topbar-title').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+
+  const loaders = {
+    dashboard: loadDashboard,
+    sales: loadSales,
+    commissions: loadCommissions,
+    withdraw: loadWithdraw,
+    profile: loadProfile,
+    products: loadAffProducts,
+    leaderboard: loadAffLeaderboard
+  };
+
+  if (loaders[name]) loaders[name]();
+}
+
+// ===== COPY LINK =====
+function copyLink() {
+  if (!affiliateLink) { toast('Link not ready yet', 'error'); return; }
+  // Always use textarea trick - works every time, no permission needed
+  const el = document.createElement('textarea');
+  el.value = affiliateLink;
+  el.setAttribute('readonly', '');
+  el.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
+  document.body.appendChild(el);
+  el.select();
+  el.setSelectionRange(0, 99999); // mobile support
+  document.execCommand('copy');
+  document.body.removeChild(el);
+  // Update button text briefly to confirm
+  const btn = document.querySelector('.copy-btn');
+  if (btn) {
+    const orig = btn.textContent;
+    btn.textContent = '✓ COPIED!';
+    btn.style.background = 'var(--green)';
+    setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 2000);
+  }
+  toast('Link copied! 🔗', 'success');
+}
+
+// ===== DASHBOARD =====
+async function loadDashboard() {
+  if (!affiliateData) return;
+  const affId = affiliateData.id;
+
+  // Load commissions
+  const { data: comms } = await sb.from('commissions').select('amount, status').eq('affiliate_id', affId);
+  const totalEarned = affiliateData.total_earnings || 0;
+  const available = affiliateData.available_balance || 0;
+  const pending = (comms || []).filter(c => c.status === 'pending').reduce((s, c) => s + c.amount, 0);
+
+  // Load orders
+  const { data: orders } = await sb.from('orders')
+    .select('id, created_at, total_amount, status')
+    .eq('affiliate_id', affId)
+    .order('created_at', { ascending: false });
+
+  document.getElementById('stat-sales').textContent = orders?.length || 0;
+  document.getElementById('stat-earned').textContent = `KES ${totalEarned.toLocaleString()}`;
+  document.getElementById('stat-available').textContent = `KES ${available.toLocaleString()}`;
+  document.getElementById('stat-pending').textContent = `KES ${pending.toLocaleString()}`;
+
+  // Recent sales table
+  const tbody = document.getElementById('dash-sales-tbody');
+  const recent = (orders || []).slice(0, 5);
+
+  if (!recent.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="icon">📊</div><p>No sales yet — share your link to get started!</p></div></td></tr>`;
+    return;
+  }
+
+  // Get commissions per order
+  const { data: ordComms } = await sb.from('commissions').select('order_id, amount, status').eq('affiliate_id', affId);
+  const commMap = {};
+  (ordComms || []).forEach(c => commMap[c.order_id] = c);
+
+  tbody.innerHTML = recent.map(o => {
+    const comm = commMap[o.id];
+    return `
+      <tr>
+        <td><span style="font-family:'Space Mono',monospace; font-size:11px; color:var(--muted);">LTX-${o.id.slice(0,8).toUpperCase()}</span></td>
+        <td style="color:var(--muted); font-size:11px;">${new Date(o.created_at).toLocaleDateString()}</td>
+        <td style="font-family:'Bebas Neue',cursive; font-size:20px; color:var(--gold);">KES ${o.total_amount?.toLocaleString()}</td>
+        <td style="color:var(--green); font-weight:700;">+KES ${comm?.amount?.toLocaleString() || '—'}</td>
+        <td>${commPill(comm?.status)}</td>
+      </tr>`;
+  }).join('');
+}
+
+// ===== SALES =====
+async function loadSales() {
+  if (!affiliateData) return;
+  const tbody = document.getElementById('sales-tbody');
+
+  const { data: orders } = await sb.from('orders')
+    .select('*, order_items(quantity, unit_price, product_id)')
+    .eq('affiliate_id', affiliateData.id)
+    .order('created_at', { ascending: false });
+
+  const { data: comms } = await sb.from('commissions')
+    .select('order_id, amount, status')
+    .eq('affiliate_id', affiliateData.id);
+
+  const commMap = {};
+  (comms || []).forEach(c => commMap[c.order_id] = c);
+
+  if (!orders?.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">💳</div><p>No sales yet. Share your affiliate link!</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = orders.map(o => {
+    const comm = commMap[o.id];
+    const itemCount = o.order_items?.reduce((s, i) => s + i.quantity, 0) || 0;
+    return `
+      <tr>
+        <td><span class="code-tag">LTX-${o.id.slice(0,8).toUpperCase()}</span></td>
+        <td style="color:var(--muted); font-size:11px;">${new Date(o.created_at).toLocaleDateString()}</td>
+        <td>${o.delivery_name || '—'}</td>
+        <td style="color:var(--muted);">${itemCount} item${itemCount !== 1 ? 's' : ''}</td>
+        <td style="font-family:'Bebas Neue',cursive; font-size:20px; color:var(--gold);">KES ${o.total_amount?.toLocaleString()}</td>
+        <td style="color:var(--green); font-weight:700;">+KES ${comm?.amount?.toLocaleString() || '0'}</td>
+        <td>${commPill(comm?.status)}</td>
+      </tr>`;
+  }).join('');
+}
+
+// ===== COMMISSIONS =====
+async function loadCommissions() {
+  if (!affiliateData) return;
+
+  const { data: comms } = await sb.from('commissions')
+    .select('*, orders(id, created_at)')
+    .eq('affiliate_id', affiliateData.id)
+    .order('created_at', { ascending: false });
+
+  const total = affiliateData.total_earnings || 0;
+  const available = affiliateData.available_balance || 0;
+  const paid = (comms || []).filter(c => c.status === 'paid').reduce((s, c) => s + c.amount, 0);
+  const pending = (comms || []).filter(c => c.status === 'pending').reduce((s, c) => s + c.amount, 0);
+
+  document.getElementById('comm-total').textContent = `KES ${total.toLocaleString()}`;
+  document.getElementById('comm-paid').textContent = `KES ${paid.toLocaleString()}`;
+  document.getElementById('comm-available').textContent = `KES ${available.toLocaleString()}`;
+  document.getElementById('comm-pending').textContent = `KES ${pending.toLocaleString()}`;
+
+  const tbody = document.getElementById('comm-tbody');
+
+  if (!comms?.length) {
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="icon">💰</div><p>No commissions yet</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = comms.map(c => `
+    <tr>
+      <td><span class="code-tag">LTX-${c.orders?.id?.slice(0,8).toUpperCase() || '—'}</span></td>
+      <td style="color:var(--muted); font-size:11px;">${new Date(c.created_at).toLocaleDateString()}</td>
+      <td style="font-family:'Bebas Neue',cursive; font-size:20px; color:var(--green);">+KES ${c.amount?.toLocaleString()}</td>
+      <td>${commPill(c.status)}</td>
+    </tr>`).join('');
+}
+
+// ===== WITHDRAW =====
+async function loadWithdraw() {
+  if (!affiliateData) return;
+
+  // Refresh affiliate data for latest balance
+  const { data: fresh } = await sb.from('affiliates').select('available_balance').eq('id', affiliateData.id).single();
+  const balance = fresh?.available_balance || 0;
+  affiliateData.available_balance = balance;
+
+  document.getElementById('wd-balance').textContent = `KES ${balance.toLocaleString()}`;
+
+  // Pre-fill phone from profile
+  const { data: profile } = await sb.from('profiles').select('phone').eq('id', currentUser.id).single();
+  if (profile?.phone) document.getElementById('wd-mpesa').value = profile.phone;
+
+  // Load history
+  const { data: wds } = await sb.from('withdrawals')
+    .select('*')
+    .eq('affiliate_id', affiliateData.id)
+    .order('requested_at', { ascending: false });
+
+  const tbody = document.getElementById('wd-history-tbody');
+
+  if (!wds?.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="icon">🏦</div><p>No withdrawal requests yet</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = wds.map(w => `
+    <tr>
+      <td style="color:var(--muted); font-size:11px;">${new Date(w.requested_at).toLocaleDateString()}</td>
+      <td style="font-family:'Bebas Neue',cursive; font-size:20px; color:var(--gold);">KES ${w.amount?.toLocaleString()}</td>
+      <td style="color:var(--muted);">${w.method === 'mpesa' ? 'M-Pesa' : 'Bank'}</td>
+      <td style="color:var(--muted);">${w.mpesa_number || '—'}</td>
+      <td>${wdPill(w.status)}</td>
+    </tr>`).join('');
+}
+
+async function requestWithdrawal() {
+  const amount = parseFloat(document.getElementById('wd-amount').value);
+  const method = document.getElementById('wd-method').value;
+  const mpesa = document.getElementById('wd-mpesa').value.trim();
+  const errEl = document.getElementById('wd-err');
+  const btn = document.getElementById('wd-btn');
+
+  errEl.style.display = 'none';
+
+  const balance = affiliateData.available_balance || 0;
+
+  if (!amount || amount <= 0) { errEl.textContent = 'Enter a valid amount'; errEl.style.display = 'block'; return; }
+  if (amount > balance) { errEl.textContent = `You only have KES ${balance.toLocaleString()} available`; errEl.style.display = 'block'; return; }
+  if (!mpesa) { errEl.textContent = 'Enter your M-Pesa number'; errEl.style.display = 'block'; return; }
+  if (amount < 100) { errEl.textContent = 'Minimum withdrawal is KES 100'; errEl.style.display = 'block'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'SUBMITTING...';
+
+  const { error } = await sb.from('withdrawals').insert({
+    affiliate_id: affiliateData.id,
+    amount,
+    method,
+    mpesa_number: mpesa,
+    status: 'pending'
+  });
+
+  btn.disabled = false;
+  btn.textContent = 'REQUEST WITHDRAWAL';
+
+  if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; return; }
+
+  toast('✅ Withdrawal request sent! Admin will process within 24h.', 'success');
+  document.getElementById('wd-amount').value = '';
+  loadWithdraw();
+}
+
+// ===== PROFILE =====
+async function loadProfile() {
+  if (!affiliateData) return;
+  const profile = affiliateData.profiles;
+
+  document.getElementById('prof-name').value = profile?.full_name || '';
+  document.getElementById('prof-email').value = currentUser.email;
+  document.getElementById('prof-phone').value = profile?.phone || '';
+  document.getElementById('prof-code').value = affiliateData.affiliate_code;
+  document.getElementById('prof-status').value = affiliateData.status.toUpperCase();
+  document.getElementById('prof-status').style.color = affiliateData.status === 'approved' ? 'var(--green)' : 'var(--orange)';
+}
+
+async function saveProfile() {
+  const name = document.getElementById('prof-name').value.trim();
+  const phone = document.getElementById('prof-phone').value.trim();
+
+  if (!name) { toast('Name cannot be empty', 'error'); return; }
+
+  const { error } = await sb.from('profiles').update({ full_name: name, phone }).eq('id', currentUser.id);
+
+  if (error) { toast('Error saving: ' + error.message, 'error'); return; }
+
+  // Update local state
+  affiliateData.profiles.full_name = name;
+  document.getElementById('sidebar-name').textContent = name;
+  document.getElementById('dash-welcome').textContent = `Welcome back, ${name}`;
+
+  toast('✅ Profile updated!', 'success');
+}
+
+// ===== HELPERS =====
+function commPill(status) {
+  const map = {
+    pending: ['orange', '⏳ Pending'],
+    available: ['gold', '✅ Available'],
+    paid: ['green', '💸 Paid']
+  };
+  const [cls, label] = map[status] || ['muted', status || '—'];
+  return `<span class="pill ${cls}">${label}</span>`;
+}
+
+function wdPill(status) {
+  const map = {
+    pending: ['orange', '⏳ Pending'],
+    approved: ['green', '✅ Paid'],
+    rejected: ['red', '❌ Rejected']
+  };
+  const [cls, label] = map[status] || ['muted', status];
+  return `<span class="pill ${cls}">${label}</span>`;
+}
+
+// ===== REFRESH =====
+async function refreshCurrentPage() {
+  const icon = document.getElementById('refresh-icon');
+  if (icon) { icon.style.animation = 'spin 0.6s linear'; setTimeout(() => { icon.style.animation = ''; }, 700); }
+  const activePage = document.querySelector('.page.active')?.id?.replace('page-', '');
+  const refreshMap = {
+    'dashboard': loadDashboard,
+    'sales': loadSales,
+    'commissions': loadCommissions,
+    'products': loadAffProducts,
+    'withdraw': loadWithdraw,
+    'profile': loadProfile
+  };
+  const fn = refreshMap[activePage];
+  if (fn) { await fn(); toast('Refreshed', 'success'); }
+}
+
+
+// ===== PRODUCTS CATALOG =====
+async function loadAffProducts() {
+  const grid = document.getElementById('aff-products-grid');
+  if (!grid) return;
+  grid.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
+
+  const { data, error } = await sb.from('products')
+    .select('id, name, price, category, sizes, commission_rate, image_url, discount_percent, stock_quantity')
+    .eq('is_active', true)
+    .order('created_at', { ascending: false });
+
+  if (!data?.length) {
+    grid.innerHTML = '<div class="empty-state"><p>No products yet</p></div>';
+    return;
+  }
+
+  // Hide new badge once viewed
+  const badge = document.getElementById('new-products-badge');
+  if (badge) badge.style.display = 'none';
+
+  grid.innerHTML = data.map(p => {
+    const effectivePrice = p.discount_percent > 0 ? Math.round(p.price * (1 - p.discount_percent / 100)) : p.price;
+    const commKES = Math.round(effectivePrice * (p.commission_rate || 15) / 100);
+    const sizesText = p.sizes?.length ? p.sizes.join(', ') : 'One size';
+    return `
+    <div style="background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--border)'">
+      ${p.image_url ? `<img src="${p.image_url}" style="width:100%;height:180px;object-fit:contain;background:var(--card2);padding:12px;box-sizing:border-box;">` : `<div style="height:180px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:48px;opacity:0.15;">&#128095;</div>`}
+      <div style="padding:16px;">
+        <div style="font-size:9px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;font-weight:700;margin-bottom:4px;">${p.category || 'shoes'}</div>
+        <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:6px;line-height:1.3;">${p.name}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div style="font-family:'Bebas Neue',cursive;font-size:22px;color:var(--orange);">KES ${effectivePrice.toLocaleString()}</div>
+          <div style="background:rgba(255,107,0,0.12);border:1px solid rgba(255,107,0,0.25);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:800;color:var(--orange);">+${p.commission_rate || 15}%</div>
+        </div>
+        <div style="background:var(--card2);border-radius:8px;padding:10px 12px;margin-bottom:12px;">
+          <div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;">You earn per sale</div>
+          <div style="font-family:'Bebas Neue',cursive;font-size:24px;color:var(--gold);">KES ${commKES.toLocaleString()}</div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Sizes: ${sizesText}</div>
+        <button onclick="window.open('lotex-website.html','_blank')" style="width:100%;background:var(--orange);border:none;border-radius:8px;padding:11px;color:#000;font-family:'Bebas Neue',cursive;font-size:15px;letter-spacing:2px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='var(--gold)'" onmouseout="this.style.background='var(--orange)'">VIEW IN STORE →</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Show new products badge if any added recently (last 7 days)
+async function checkNewProducts() {
+  const week = new Date(Date.now() - 7*24*60*60*1000).toISOString();
+  const { data } = await sb.from('products').select('id').eq('is_active', true).gte('created_at', week);
+  if (data?.length) {
+    const badge = document.getElementById('new-products-badge');
+    if (badge) { badge.textContent = data.length + ' NEW'; badge.style.display = 'flex'; }
+  }
+}
+
+
+// ===== LEADERBOARD =====
+async function loadAffLeaderboard() {
+  const container = document.getElementById('aff-leaderboard-content');
+  if (!container) return;
+  container.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
+
+  const { data: affiliates } = await sb.from('affiliates')
+    .select('id, affiliate_code, total_earnings, profiles(full_name)')
+    .eq('status', 'approved')
+    .order('total_earnings', { ascending: false });
+
+  const { data: orders } = await sb.from('orders').select('affiliate_id');
+
+  if (!affiliates?.length) {
+    container.innerHTML = '<div class="empty-state"><p>No affiliates yet</p></div>';
+    return;
+  }
+
+  const ordersPerAff = {};
+  (orders || []).forEach(o => {
+    if (o.affiliate_id) ordersPerAff[o.affiliate_id] = (ordersPerAff[o.affiliate_id] || 0) + 1;
+  });
+
+  const topEarner = affiliates[0]?.total_earnings || 1;
+  const medals = [
+    `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="8"/><path d="M8 2h8l2 4H6l2-4z"/><line x1="12" y1="6" x2="12" y2="10"/></svg>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#cd7f32" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>`
+  ];
+  const rankColors = ['#f59e0b','#94a3b8','#cd7f32'];
+  const myId = affiliateData?.id;
+
+  container.innerHTML = affiliates.map((aff, i) => {
+    const isMe = aff.id === myId;
+    const pct = topEarner > 0 ? Math.round((aff.total_earnings || 0) / topEarner * 100) : 0;
+    const sales = ordersPerAff[aff.id] || 0;
+    const name = aff.profiles?.full_name || aff.affiliate_code;
+    return `
+    <div style="background:var(--card); border:1px solid ${isMe ? 'var(--orange)' : i < 3 ? rankColors[i] : 'var(--border)'}; border-radius:12px; padding:16px 20px; margin-bottom:10px; display:flex; align-items:center; gap:16px; ${isMe ? 'box-shadow:0 0 16px rgba(255,107,0,0.15);' : ''}">
+      <div style="min-width:36px; text-align:center; display:flex; align-items:center; justify-content:center;">
+        ${i < 3 ? medals[i] : `<span style="font-family:'Bebas Neue',cursive;font-size:18px;color:var(--muted);">#${i+1}</span>`}
+      </div>
+      <div style="flex:1; min-width:0;">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+          <span style="font-size:13px; font-weight:800; color:${isMe ? 'var(--orange)' : 'var(--text)'};">${name}</span>
+          ${isMe ? '<span style="font-size:10px; background:var(--orange); color:#000; padding:2px 8px; border-radius:10px; font-weight:700;">YOU</span>' : ''}
+        </div>
+        <div style="font-size:11px; color:var(--muted); margin-bottom:6px;">${sales} sale${sales !== 1 ? 's' : ''}</div>
+        <div style="background:rgba(255,255,255,0.05); border-radius:4px; height:5px; overflow:hidden;">
+          <div style="height:100%; width:${pct}%; background:${isMe ? 'var(--orange)' : i < 3 ? rankColors[i] : 'var(--muted)'}; border-radius:4px;"></div>
+        </div>
+        <div style="font-size:10px; color:var(--muted); margin-top:3px;">${pct}% of top earner</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-family:'Bebas Neue',cursive; font-size:24px; color:${isMe ? 'var(--orange)' : 'var(--gold)'};">KES ${(aff.total_earnings || 0).toLocaleString()}</div>
+        <div style="font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px;">Total Earned</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+</script>
+</body>
+</html>

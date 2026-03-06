@@ -1,0 +1,3111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lotex Depot — Best Prices 💯</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root {
+    --black: #000;
+    --black2: #0a0a0a;
+    --card: #0f0f0f;
+    --card2: #141414;
+    --gold: #FFD700;
+    --orange: #FF6B00;
+    --red: #CC2200;
+    --green: #22c55e;
+    --text: #e8e8e8;
+    --muted: #666;
+    --border: rgba(255,107,0,0.15);
+    --glow: 0 0 24px rgba(255,107,0,0.25);
+    --glow-gold: 0 0 24px rgba(255,215,0,0.2);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--black);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ===== NAV ===== */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    background: rgba(0,0,0,0.96);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    padding: 0 40px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .nav-logo {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 28px;
+    color: var(--gold);
+    text-shadow: var(--glow-gold);
+    letter-spacing: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .nav-logo span { color: var(--orange); }
+
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover, .nav-links a.active { color: var(--gold); }
+
+  .nav-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .cart-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--gold);
+    padding: 9px 20px;
+    border-radius: 6px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+  }
+
+  .cart-btn:hover { border-color: var(--gold); box-shadow: var(--glow-gold); }
+
+  .cart-count {
+    background: var(--orange);
+    color: #000;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .auth-btn {
+    background: transparent;
+    border: 1px solid rgba(255,215,0,0.4);
+    color: var(--gold);
+    padding: 9px 22px;
+    border-radius: 6px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+
+  .auth-btn:hover { border-color: var(--gold); box-shadow: var(--glow-gold); }
+
+  .user-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 5px 14px 5px 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text);
+    font-family: 'Montserrat', sans-serif;
+  }
+  .user-btn:hover { border-color: var(--orange); }
+
+  .user-avatar {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--orange), var(--gold));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    color: #000;
+    flex-shrink: 0;
+  }
+
+  .user-name-label { font-size: 12px; font-weight: 700; color: var(--text); }
+  .user-menu { position: relative; }
+
+  .user-dropdown {
+    position: absolute;
+    top: calc(100% + 10px); right: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    min-width: 210px;
+    box-shadow: var(--glow);
+    display: none;
+    z-index: 600;
+  }
+  .user-dropdown.show { display: block; animation: fadeIn 0.2s ease; }
+
+  .dd-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--card2);
+  }
+
+  .dd-item {
+    padding: 11px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: block;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .dd-item:hover { background: rgba(255,107,0,0.08); color: var(--orange); }
+  .dd-item.danger { color: var(--red); }
+  .dd-item.danger:hover { background: rgba(204,34,0,0.08); }
+
+  /* SIZE CHIPS */
+  .size-grid { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 14px; }
+  .prompt-chip {
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,107,0,0.25);
+    background: var(--card);
+    color: var(--muted);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .prompt-chip:hover, .prompt-chip.selected {
+    background: var(--orange);
+    color: #000;
+    border-color: var(--orange);
+  }
+
+  .support-bubble {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+  }
+  .support-bubble.customer { align-items: flex-end; }
+  .support-bubble.admin { align-items: flex-start; }
+  .support-bubble .bubble-body {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .support-bubble.customer .bubble-body { background: var(--orange); color: #000; border-radius: 12px 12px 2px 12px; }
+  .support-bubble.admin .bubble-body { background: var(--card2); color: var(--text); border-radius: 12px 12px 12px 2px; }
+  .bubble-meta { font-size: 10px; color: var(--muted); margin-top: 3px; }
+
+  .size-chip {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 13px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text);
+    font-family: "Montserrat", sans-serif;
+  }
+  .size-chip:hover { border-color: var(--orange); color: var(--orange); }
+  .size-chip.selected { background: var(--orange); border-color: var(--orange); color: #000; }
+
+  /* ===== PAGES ===== */
+  .page { display: none; }
+  .page.active { display: block; animation: fadeIn 0.3s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    min-height: 520px;
+    display: flex;
+    align-items: center;
+    padding: 60px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -120px; right: -80px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(255,107,0,0.12) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -100px; left: 20%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(255,215,0,0.06) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .hero-content { position: relative; z-index: 2; max-width: 580px; }
+
+  .hero-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: var(--orange);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    width: 32px; height: 2px;
+    background: var(--orange);
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 96px;
+    line-height: 0.88;
+    color: var(--gold);
+    text-shadow: 0 0 60px rgba(255,215,0,0.3);
+    margin-bottom: 10px;
+  }
+
+  .hero-title .line2 {
+    color: var(--orange);
+    display: block;
+  }
+
+  .hero-desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 36px;
+    max-width: 400px;
+  }
+
+  .hero-desc strong { color: var(--text); }
+
+  .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .btn-hero {
+    padding: 15px 36px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s;
+    border: none;
+  }
+
+  .btn-hero.primary {
+    background: var(--orange);
+    color: #000;
+    box-shadow: var(--glow);
+  }
+
+  .btn-hero.primary:hover { background: var(--gold); transform: translateY(-2px); }
+
+  .btn-hero.outline {
+    background: transparent;
+    color: var(--gold);
+    border: 1px solid rgba(255,215,0,0.4);
+  }
+
+  .btn-hero.outline:hover { border-color: var(--gold); box-shadow: var(--glow-gold); }
+
+  .hero-floats {
+    position: absolute;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    opacity: 0.7;
+  }
+
+  .hero-float {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 24px;
+    text-align: center;
+    min-width: 110px;
+  }
+
+  .hero-float .fv {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 38px;
+    color: var(--gold);
+    display: block;
+    line-height: 1;
+  }
+
+  .hero-float .fl {
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* ===== AFFILIATE STRIP ===== */
+  .aff-strip {
+    background: linear-gradient(90deg, rgba(255,107,0,0.08), rgba(255,215,0,0.05), rgba(255,107,0,0.08));
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 40px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .aff-strip strong { color: var(--orange); }
+  .aff-strip a {
+    margin-left: auto;
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  /* ===== SECTION ===== */
+  .section { padding: 56px 40px; }
+
+  .section-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 28px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 36px;
+    color: var(--text);
+    letter-spacing: 3px;
+  }
+
+  .section-sub {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* ===== PRODUCT GRID ===== */
+  .prod-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+  }
+
+  .prod-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+  }
+
+  .prod-card:hover {
+    border-color: rgba(255,107,0,0.5);
+    box-shadow: var(--glow);
+    transform: translateY(-4px);
+  }
+
+  .prod-img {
+    height: 260px;
+    background: var(--card2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .prod-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    padding: 12px;
+    transition: transform 0.4s, opacity 0.15s;
+  }
+
+  .prod-card:hover .prod-img img { transform: scale(1.05); }
+
+  .prod-img-placeholder { font-size: 64px; opacity: 0.25; }
+
+  .discount-badge {
+    position: absolute;
+    top: 12px; left: 12px;
+    background: var(--red);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+    z-index: 2;
+  }
+
+  .prod-body { padding: 18px; }
+
+  .prod-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+
+  .prod-price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .prod-price {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 26px;
+    color: var(--gold);
+  }
+
+  .prod-orig {
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: line-through;
+  }
+
+  .prod-discount-label {
+    font-size: 10px;
+    color: var(--red);
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+
+  .add-cart-btn {
+    width: 100%;
+    background: var(--orange);
+    border: none;
+    color: #000;
+    padding: 12px;
+    border-radius: 6px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .add-cart-btn:hover { background: var(--gold); }
+  .add-cart-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ===== AFFILIATE SECTION ===== */
+  .aff-section {
+    margin: 0 40px 56px;
+    background: linear-gradient(135deg, #0d0600, #150a00, #0d0d00);
+    border: 1px solid rgba(255,107,0,0.35);
+    border-radius: 16px;
+    padding: 56px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 60px rgba(255,107,0,0.08);
+  }
+
+  .aff-section::before {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 350px; height: 350px;
+    background: radial-gradient(circle, rgba(255,215,0,0.07) 0%, transparent 65%);
+  }
+
+  .aff-text h2 {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 52px;
+    color: var(--gold);
+    letter-spacing: 3px;
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+
+  .aff-text p {
+    font-size: 13px;
+    color: var(--muted);
+    max-width: 380px;
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+
+  .aff-numbers {
+    display: flex;
+    gap: 40px;
+    flex-shrink: 0;
+  }
+
+  .aff-num { text-align: center; }
+
+  .aff-num .val {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 48px;
+    color: var(--orange);
+    display: block;
+    line-height: 1;
+  }
+
+  .aff-num .key {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* ===== FOOTER ===== */
+  footer {
+    background: #040404;
+    border-top: 1px solid var(--border);
+    padding: 40px;
+    text-align: center;
+  }
+
+  .footer-logo {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 36px;
+    color: var(--gold);
+    letter-spacing: 5px;
+    text-shadow: var(--glow-gold);
+    margin-bottom: 6px;
+  }
+
+  .footer-sub { font-size: 12px; color: var(--red); letter-spacing: 2px; }
+  .footer-copy { font-size: 11px; color: var(--muted); margin-top: 16px; }
+
+  /* ===== MODALS ===== */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 900;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+    padding: 20px;
+  }
+
+  .overlay.show { display: flex; }
+
+  /* AUTH MODAL */
+  .auth-modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: var(--glow);
+    animation: fadeIn 0.3s ease;
+    position: relative;
+  }
+
+  .modal-logo {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 30px;
+    color: var(--gold);
+    text-align: center;
+    letter-spacing: 4px;
+    text-shadow: var(--glow-gold);
+    margin-bottom: 4px;
+  }
+
+  .modal-sub {
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .role-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .role-card {
+    border: 1px solid var(--border);
+    background: var(--card2);
+    border-radius: 8px;
+    padding: 18px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .role-card:hover, .role-card.sel {
+    border-color: var(--orange);
+    background: rgba(255,107,0,0.05);
+    box-shadow: var(--glow);
+  }
+
+  .role-card .ri { font-size: 28px; margin-bottom: 8px; }
+  .role-card .rl { font-size: 12px; font-weight: 700; color: var(--text); }
+
+  .fld { margin-bottom: 16px; }
+
+  .fld label {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+
+  .fld input {
+    width: 100%;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    color: var(--text);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .fld input:focus { border-color: var(--orange); box-shadow: 0 0 0 2px rgba(255,107,0,0.1); }
+
+  .btn-full {
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    margin-bottom: 12px;
+  }
+
+  .btn-full.orange { background: var(--orange); color: #000; box-shadow: var(--glow); }
+  .btn-full.orange:hover { background: var(--gold); }
+  .btn-full.orange:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .switch-link {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .switch-link span {
+    color: var(--orange);
+    cursor: pointer;
+    font-weight: 700;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 16px; right: 20px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 22px;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .modal-close:hover { color: var(--text); }
+
+  .auth-err {
+    background: rgba(204,34,0,0.1);
+    border: 1px solid rgba(204,34,0,0.3);
+    color: var(--red);
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    margin-bottom: 16px;
+    display: none;
+  }
+
+  /* CART MODAL */
+  .cart-modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 480px;
+    overflow: hidden;
+    box-shadow: var(--glow);
+    animation: fadeIn 0.3s ease;
+  }
+
+  .cart-head {
+    padding: 22px 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .cart-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 24px;
+    color: var(--gold);
+    letter-spacing: 3px;
+  }
+
+  .cart-body { padding: 8px 0; max-height: 320px; overflow-y: auto; }
+
+  .cart-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 28px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.2s;
+  }
+
+  .cart-item:last-child { border-bottom: none; }
+  .cart-item:hover { background: rgba(255,107,0,0.03); }
+
+  .ci-img {
+    width: 52px; height: 52px;
+    border-radius: 8px;
+    background: var(--card2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .ci-img img { width: 100%; height: 100%; object-fit: cover; }
+
+  .ci-info { flex: 1; min-width: 0; }
+  .ci-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ci-price { font-size: 13px; color: var(--gold); font-weight: 700; margin-top: 2px; }
+
+  .ci-qty {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .qty-btn {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    color: var(--gold);
+    width: 26px; height: 26px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .qty-btn:hover { border-color: var(--orange); }
+
+  .qty-num { font-size: 14px; font-weight: 700; min-width: 20px; text-align: center; }
+
+  .ci-remove {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px;
+    transition: color 0.2s;
+  }
+
+  .ci-remove:hover { color: var(--red); }
+
+  .cart-empty {
+    padding: 48px;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .cart-empty .icon { font-size: 40px; margin-bottom: 12px; }
+
+  .cart-foot {
+    padding: 20px 28px;
+    border-top: 1px solid var(--border);
+    background: var(--card2);
+  }
+
+  .cart-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .ct-label { font-size: 11px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+  .ct-val { font-family: 'Bebas Neue', cursive; font-size: 32px; color: var(--gold); }
+
+  /* CHECKOUT MODAL */
+  .checkout-modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--glow);
+    animation: fadeIn 0.3s ease;
+    position: relative;
+  }
+
+  .checkout-head {
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--card);
+    z-index: 10;
+  }
+
+  .checkout-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 26px;
+    color: var(--gold);
+    letter-spacing: 3px;
+  }
+
+  .checkout-body { padding: 28px 32px; }
+
+  .order-summary {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 24px;
+  }
+
+  .os-title {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .os-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  .os-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border);
+    margin-top: 12px;
+    padding-top: 12px;
+  }
+
+  .os-total-label { font-size: 12px; font-weight: 700; letter-spacing: 1px; }
+  .os-total-val { font-family: 'Bebas Neue', cursive; font-size: 28px; color: var(--gold); }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--orange);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .form-row-1 { margin-bottom: 14px; }
+
+  .cf label {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+
+  .cf input, .cf textarea {
+    width: 100%;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .cf input:focus, .cf textarea:focus {
+    border-color: var(--orange);
+    box-shadow: 0 0 0 2px rgba(255,107,0,0.1);
+  }
+
+  .cf textarea { resize: vertical; min-height: 70px; }
+
+  .mpesa-note {
+    background: rgba(34,197,94,0.08);
+    border: 1px solid rgba(34,197,94,0.2);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 12px;
+    color: var(--green);
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  .checkout-foot {
+    padding: 20px 32px;
+    border-top: 1px solid var(--border);
+    background: var(--card2);
+    position: sticky;
+    bottom: 0;
+  }
+
+  /* AFFILIATE APPLY MODAL */
+  .apply-modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 480px;
+    padding: 40px;
+    box-shadow: var(--glow);
+    animation: fadeIn 0.3s ease;
+    position: relative;
+  }
+
+  /* ORDER TRACKING */
+  .track-steps {
+    display: flex;
+    align-items: center;
+    margin: 24px 0;
+  }
+
+  .ts {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+  }
+
+  .ts::after {
+    content: '';
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background: var(--border);
+    z-index: 0;
+  }
+
+  .ts:last-child::after { display: none; }
+  .ts.done::after { background: var(--orange); }
+
+  .ts-dot {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--card2);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s;
+  }
+
+  .ts.done .ts-dot { border-color: var(--orange); background: rgba(255,107,0,0.1); }
+  .ts.current .ts-dot { border-color: var(--gold); background: rgba(255,215,0,0.1); box-shadow: var(--glow-gold); }
+
+  .ts-label {
+    font-size: 9px;
+    color: var(--muted);
+    margin-top: 8px;
+    letter-spacing: 1px;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .ts.done .ts-label, .ts.current .ts-label { color: var(--gold); }
+
+  /* SUCCESS */
+  .success-box {
+    text-align: center;
+    padding: 48px 32px;
+  }
+
+  .success-icon { font-size: 64px; margin-bottom: 16px; }
+
+  .success-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 40px;
+    color: var(--gold);
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+
+  .success-sub { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  /* LOADING & EMPTY */
+  .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    color: var(--muted);
+    gap: 12px;
+    font-size: 13px;
+    grid-column: 1/-1;
+  }
+
+  .spinner {
+    width: 22px; height: 22px;
+    border: 2px solid var(--border);
+    border-top-color: var(--orange);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px;
+    color: var(--muted);
+    grid-column: 1/-1;
+  }
+
+  .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-state p { font-size: 13px; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 28px; right: 28px;
+    padding: 14px 22px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 9999;
+    transform: translateX(120%);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-width: 300px;
+  }
+
+  .toast.show { transform: translateX(0); }
+  .toast.success { background: var(--card); border: 1px solid rgba(34,197,94,0.4); color: var(--green); }
+  .toast.error { background: var(--card); border: 1px solid rgba(204,34,0,0.4); color: var(--red); }
+  .toast.info { background: var(--card); border: 1px solid var(--border); color: var(--orange); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* USER MENU */
+  .user-menu {
+    position: relative;
+  }
+
+  .user-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+
+  .user-btn:hover { border-color: var(--orange); }
+
+  .user-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    min-width: 160px;
+    box-shadow: var(--glow);
+    display: none;
+    z-index: 600;
+  }
+
+  .user-dropdown.show { display: block; }
+
+  .dd-item {
+    padding: 12px 18px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: block;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .dd-item:hover { background: rgba(255,107,0,0.08); color: var(--orange); }
+  .dd-item.danger { color: var(--red); }
+  .dd-item.danger:hover { background: rgba(204,34,0,0.08); }
+
+  @media (max-width: 768px) {
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    .hero { padding: 40px 20px; }
+    .hero-title { font-size: 64px; }
+    .hero-floats { display: none; }
+    .section { padding: 40px 20px; }
+    .aff-section { margin: 0 20px 40px; padding: 36px 24px; flex-direction: column; gap: 32px; }
+    .aff-numbers { gap: 24px; }
+    .prod-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo" onclick="goHome()">LOTEX<span>.</span></div>
+  <ul class="nav-links">
+    <li><a onclick="goHome()" id="nav-home" class="active">Home</a></li>
+    <li><a onclick="showShop('shoes')" id="nav-shoes">Shoes</a></li>
+    <li><a onclick="showShop('clothes')" id="nav-clothes">Clothes</a></li>
+    <li><a onclick="showTrack()" id="nav-track">Track Order</a></li>
+    <li><a onclick="showSupport()" id="nav-support" style="position:relative;">Support<span id="support-notif-dot" style="display:none;position:absolute;top:-2px;right:-8px;width:7px;height:7px;border-radius:50%;background:var(--orange);"></span></a></li>
+    <li><a onclick="showApply()">Become Affiliate</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="cart-btn" onclick="openCart()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>Cart <span class="cart-count" id="cart-count">0</span>
+    </button>
+    <div id="auth-area">
+      <button class="auth-btn" onclick="openAuth()">LOG IN</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== HOME PAGE ===== -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-eyebrow">New Drops Available Now</div>
+      <div class="hero-title">
+        LOTEX
+        <span class="line2">DEPOT.</span>
+      </div>
+      <div class="hero-desc">
+        Premium shoes &amp; clothes at <strong>unbeatable prices</strong>. From classic kicks to fresh fits — we got you covered.
+      </div>
+      <div class="hero-btns">
+        <button class="btn-hero primary" onclick="showShop()">SHOP NOW</button>
+        <button class="btn-hero outline" onclick="showApply()">EARN AS AFFILIATE</button>
+      </div>
+    </div>
+    <div class="hero-floats">
+      <div class="hero-float"><span class="fv" id="hero-prod-count">—</span><span class="fl">Products</span></div>
+      <div class="hero-float"><span class="fv">15%</span><span class="fl">Commission</span></div>
+      <div class="hero-float"><span class="fv">24H</span><span class="fl">Delivery</span></div>
+    </div>
+  </div>
+
+  <div class="aff-strip" id="aff-strip" style="display:none;">
+    <span>🔗 You were referred by an affiliate</span>
+    <strong id="ref-name-strip"></strong>
+    <span>— any purchase you make earns them a commission</span>
+    <a onclick="showApply()">Want to earn too? →</a>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <div>
+        <div class="section-title">FEATURED SHOES</div>
+        <div class="section-sub">Hand-picked for you</div>
+      </div>
+      <button class="btn-hero outline" style="padding:10px 20px; font-size:11px;" onclick="showShop('shoes')">VIEW ALL →</button>
+    </div>
+    <div class="prod-grid" id="featured-shoes-grid">
+      <div class="loading"><div class="spinner"></div>Loading...</div>
+    </div>
+  </div>
+
+  <div class="section" id="featured-clothes-section" style="display:none;">
+    <div class="section-head">
+      <div>
+        <div class="section-title">FEATURED CLOTHES</div>
+        <div class="section-sub">Fresh fits, picked for you</div>
+      </div>
+      <button class="btn-hero outline" style="padding:10px 20px; font-size:11px;" onclick="showShop('clothes')">VIEW ALL →</button>
+    </div>
+    <div class="prod-grid" id="featured-clothes-grid">
+      <div class="loading"><div class="spinner"></div>Loading...</div>
+    </div>
+  </div>
+
+  <div class="aff-section">
+    <div class="aff-text">
+      <h2>EARN WHILE YOU SELL</h2>
+      <p>Join the Lotex Depot affiliate program. Get your unique link, share it anywhere — every sale you drive earns you a commission straight to your pocket.</p>
+      <button class="btn-hero primary" onclick="showApply()">APPLY NOW — IT'S FREE</button>
+    </div>
+    <div class="aff-numbers">
+      <div class="aff-num"><span class="val">15%</span><span class="key">Commission</span></div>
+      <div class="aff-num"><span class="val">48H</span><span class="key">Payout</span></div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-logo">LOTEX DEPOT</div>
+    <div class="footer-sub">best prices 💛 100</div>
+    <div style="margin-top:20px; padding-top:20px; border-top:1px solid rgba(255,107,0,0.1); display:flex; justify-content:center; gap:32px; flex-wrap:wrap;">
+      <span onclick="showShop()" style="font-size:12px; color:var(--muted); cursor:pointer; transition:color 0.2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">Shop</span>
+      <span onclick="showSupport()" style="font-size:12px; color:var(--muted); cursor:pointer; transition:color 0.2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">Support</span>
+      <span onclick="showApply()" style="font-size:12px; color:var(--muted); cursor:pointer; transition:color 0.2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">Become Affiliate</span>
+      <a href="lotex-affiliate.html" style="font-size:12px; color:var(--orange); font-weight:700; text-decoration:none; letter-spacing:1px;">🔗 Affiliate Login</a>
+    </div>
+    <div class="footer-copy">© 2026 Lotex Depot. All rights reserved.</div>
+  </footer>
+</div>
+
+<!-- ===== SHOP PAGE ===== -->
+<div class="page" id="page-shop">
+  <div class="section">
+    <!-- CATEGORY TABS -->
+    <div style="display:flex; gap:4px; margin-bottom:32px; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:4px; width:fit-content;">
+      <button id="tab-shoes" onclick="switchShopTab('shoes')" style="padding:10px 28px; border-radius:7px; border:none; background:var(--orange); color:#000; font-family:'Montserrat',sans-serif; font-size:12px; font-weight:800; letter-spacing:1px; cursor:pointer; transition:all 0.2s; text-transform:uppercase;">Shoes</button>
+      <button id="tab-clothes" onclick="switchShopTab('clothes')" style="padding:10px 28px; border-radius:7px; border:none; background:transparent; color:var(--muted); font-family:'Montserrat',sans-serif; font-size:12px; font-weight:800; letter-spacing:1px; cursor:pointer; transition:all 0.2s; text-transform:uppercase;">Clothes</button>
+    </div>
+
+    <!-- SHOES SECTION -->
+    <div id="shop-section-shoes">
+      <div class="section-head">
+        <div>
+          <div class="section-title">SHOES & SNEAKERS</div>
+          <div class="section-sub">Fresh kicks at unbeatable prices</div>
+        </div>
+      </div>
+      <div class="prod-grid" id="shop-grid-shoes">
+        <div class="loading"><div class="spinner"></div>Loading...</div>
+      </div>
+    </div>
+
+    <!-- CLOTHES SECTION -->
+    <div id="shop-section-clothes" style="display:none;">
+      <div class="section-head">
+        <div>
+          <div class="section-title">CLOTHES & APPAREL</div>
+          <div class="section-sub">Style from head to toe</div>
+        </div>
+      </div>
+      <div class="prod-grid" id="shop-grid-clothes">
+        <div class="loading"><div class="spinner"></div>Loading...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- ===== SUPPORT PAGE ===== -->
+<div class="page" id="page-support">
+  <div class="section" style="max-width:640px; margin:0 auto;">
+    <div class="section-title">CUSTOMER SUPPORT</div>
+    <div class="section-sub" style="margin-bottom:32px;">We're here to help. Reach out any time.</div>
+
+    <!-- CONTACT OPTIONS -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:40px;">
+      <a href="tel:0799672206" style="text-decoration:none;">
+        <div style="background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px; text-align:center; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="margin-bottom:12px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.16 6.16l1.27-.84a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <div style="font-family:'Bebas Neue',cursive; font-size:18px; letter-spacing:2px; color:var(--text); margin-bottom:4px;">CALL US</div>
+          <div style="font-size:13px; color:var(--orange); font-weight:700;">0799 672 206</div>
+          <div style="font-size:11px; color:var(--muted); margin-top:4px;">Mon – Sat, 8am – 8pm</div>
+        </div>
+      </a>
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px; text-align:center; cursor:pointer; transition:all 0.2s;" onclick="scrollToChat()" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="margin-bottom:12px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div style="font-family:'Bebas Neue',cursive; font-size:18px; letter-spacing:2px; color:var(--text); margin-bottom:4px;">LIVE CHAT</div>
+        <div style="font-size:11px; color:var(--muted); margin-top:4px;">Message our team below</div>
+        <div style="font-size:11px; color:var(--orange); margin-top:2px;">Usually replies within 1 hour</div>
+      </div>
+    </div>
+
+    <!-- QUICK PROMPTS -->
+    <div style="margin-bottom:28px;" id="chat-anchor">
+      <div style="font-size:10px; font-weight:700; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:12px;">Quick Topics — tap to select</div>
+      <div style="display:flex; flex-wrap:wrap; gap:8px;" id="quick-prompts">
+        <button class="prompt-chip" onclick="selectPrompt(this, 'My product hasn\'t arrived yet')">&#128230; Product not arrived</button>
+        <button class="prompt-chip" onclick="selectPrompt(this, 'I received a damaged product')">&#128721; Damaged product</button>
+        <button class="prompt-chip" onclick="selectPrompt(this, 'I want to return or exchange my order')">&#8635; Return / Exchange</button>
+        <button class="prompt-chip" onclick="selectPrompt(this, 'I received the wrong item')">&#10060; Wrong item received</button>
+        <button class="prompt-chip" onclick="selectPrompt(this, 'I want to check my order status')">&#128269; Order status</button>
+        <button class="prompt-chip" onclick="selectPrompt(this, 'I have a payment issue')">&#128179; Payment issue</button>
+        <button class="prompt-chip" onclick="selectPrompt(this, 'Other — I have a question')">&#128172; Other</button>
+      </div>
+    </div>
+
+    <!-- CHAT FORM -->
+    <div style="background:var(--card); border:1px solid var(--border); border-radius:16px; overflow:hidden;" id="support-chat-box">
+      <div style="padding:16px 20px; border-bottom:1px solid var(--border); background:var(--card2); display:flex; align-items:center; gap:10px;">
+        <div style="width:10px; height:10px; border-radius:50%; background:#22c55e;"></div>
+        <span style="font-size:12px; font-weight:700; letter-spacing:1px; color:var(--text);">LOTEX SUPPORT</span>
+        <span style="font-size:11px; color:var(--muted); margin-left:auto;">We reply fast &#9889;</span>
+      </div>
+
+      <!-- Thread view (shows after submit) -->
+      <div id="support-thread" style="display:none; padding:20px; max-height:260px; overflow-y:auto;"></div>
+
+      <!-- Customer reply input - shown when thread is active -->
+      <div id="support-reply-area" style="display:none; padding:12px 16px; border-top:1px solid var(--border);">
+        <div style="display:flex; gap:8px;">
+          <textarea id="customer-reply-input" rows="2" placeholder="Reply..." style="flex:1; background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:10px 14px; color:var(--text); font-family:'Montserrat',sans-serif; font-size:13px; outline:none; resize:none; box-sizing:border-box;"></textarea>
+          <button onclick="sendCustomerReply()" style="background:var(--orange); border:none; border-radius:8px; padding:10px 16px; color:#000; font-family:'Bebas Neue',cursive; font-size:15px; letter-spacing:1px; cursor:pointer; flex-shrink:0; align-self:flex-end;">SEND</button>
+        </div>
+      </div>
+
+      <!-- Input area (initial form) -->
+      <div id="support-form-area" style="padding:20px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+          <div>
+            <label style="font-size:10px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; display:block; margin-bottom:6px;">Your Name</label>
+            <input id="support-name" placeholder="e.g. Jane Doe" style="width:100%; background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:10px 14px; color:var(--text); font-family:'Montserrat',sans-serif; font-size:13px; outline:none; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:10px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; display:block; margin-bottom:6px;">Email (optional)</label>
+            <input id="support-email" type="email" placeholder="for follow-up" style="width:100%; background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:10px 14px; color:var(--text); font-family:'Montserrat',sans-serif; font-size:13px; outline:none; box-sizing:border-box;">
+          </div>
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="font-size:10px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; display:block; margin-bottom:6px;">Message</label>
+          <textarea id="support-message" rows="4" placeholder="Describe your issue..." style="width:100%; background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:10px 14px; color:var(--text); font-family:'Montserrat',sans-serif; font-size:13px; outline:none; resize:vertical; box-sizing:border-box;"></textarea>
+        </div>
+        <button onclick="submitSupport()" style="width:100%; background:var(--orange); border:none; border-radius:8px; padding:14px; color:#000; font-family:'Bebas Neue',cursive; font-size:16px; letter-spacing:3px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='var(--gold)'" onmouseout="this.style.background='var(--orange)'">SEND MESSAGE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== APPLY PAGE ===== -->
+
+
+<div class="page" id="page-track">
+  <div class="section" style="max-width:600px; margin:0 auto;">
+    <div class="section-title" style="margin-bottom:8px;">TRACK YOUR ORDER</div>
+    <div style="font-size:13px; color:var(--muted); margin-bottom:32px;">Enter your Order ID to see real-time delivery status</div>
+
+    <div style="display:flex; gap:10px; margin-bottom:32px;">
+      <input id="track-input" placeholder="e.g. LTX-A1B2C3D4" style="flex:1; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px 18px; color:var(--text); font-family:'Montserrat',sans-serif; font-size:14px; outline:none; transition:border 0.2s;" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')trackOrder()">
+      <button onclick="trackOrder()" style="background:var(--orange); border:none; border-radius:10px; padding:14px 24px; color:#000; font-family:'Bebas Neue',cursive; font-size:16px; letter-spacing:2px; cursor:pointer; white-space:nowrap; transition:background 0.2s;" onmouseover="this.style.background='var(--gold)'" onmouseout="this.style.background='var(--orange)'">TRACK</button>
+    </div>
+
+    <div id="track-result"></div>
+  </div>
+</div>
+
+<div class="page" id="page-orders">
+  <div class="section" style="max-width:680px; margin:0 auto;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:28px;">
+      <div>
+        <div class="section-title" style="margin-bottom:4px;">MY ORDERS</div>
+        <div style="font-size:12px; color:var(--muted);">Track all your purchases</div>
+      </div>
+      <button onclick="goHome()" style="background:none; border:1px solid var(--border); border-radius:8px; padding:8px 16px; color:var(--muted); font-family:'Montserrat',sans-serif; font-size:11px; font-weight:700; letter-spacing:1px; cursor:pointer;">← BACK</button>
+    </div>
+    <div id="my-orders-list">
+      <div class="loading"><div class="spinner"></div>Loading your orders...</div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-apply">
+  <div class="section" style="max-width:560px; margin:0 auto;">
+    <div class="section-title">BECOME AN AFFILIATE</div>
+    <div class="section-sub" style="margin-bottom:32px;">Apply & start earning commission on every sale</div>
+
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:32px;">
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:10px; padding:24px 16px; text-align:center;">
+        <div style="font-size:32px; margin-bottom:10px;">🔗</div>
+        <div style="font-size:12px; font-weight:700; color:var(--gold);">Get Your Link</div>
+        <div style="font-size:11px; color:var(--muted); margin-top:4px;">Unique to you</div>
+      </div>
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:10px; padding:24px 16px; text-align:center;">
+        <div style="font-size:32px; margin-bottom:10px;">📢</div>
+        <div style="font-size:12px; font-weight:700; color:var(--gold);">Share & Sell</div>
+        <div style="font-size:11px; color:var(--muted); margin-top:4px;">Anywhere online</div>
+      </div>
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:10px; padding:24px 16px; text-align:center;">
+        <div style="font-size:32px; margin-bottom:10px;">💰</div>
+        <div style="font-size:12px; font-weight:700; color:var(--gold);">Earn Commission</div>
+        <div style="font-size:11px; color:var(--muted); margin-top:4px;">Per sale made</div>
+      </div>
+    </div>
+
+    <div style="background:var(--card); border:1px solid var(--border); border-radius:12px; padding:36px;">
+      <div class="fld">
+        <label>Full Name</label>
+        <input id="apply-name" placeholder="Your full name">
+      </div>
+      <div class="fld">
+        <label>Email Address</label>
+        <input id="apply-email" type="email" placeholder="you@email.com">
+      </div>
+      <div class="fld">
+        <label>Phone Number</label>
+        <input id="apply-phone" type="tel" placeholder="+254...">
+      </div>
+      <div class="fld">
+        <label>Password</label>
+        <input id="apply-pass" type="password" placeholder="Create a password">
+      </div>
+      <div class="fld">
+        <label>Confirm Password</label>
+        <input id="apply-pass-confirm" type="password" placeholder="Repeat your password">
+      </div>
+      <div class="fld" style="margin-bottom:24px;">
+        <label>How will you promote? (optional)</label>
+        <input id="apply-promo" placeholder="Instagram, TikTok, WhatsApp groups...">
+      </div>
+      <div id="apply-err" class="auth-err"></div>
+      <button class="btn-full orange" id="apply-btn" onclick="submitApplication()">SUBMIT APPLICATION</button>
+      <div style="text-align:center; font-size:11px; color:var(--muted);">Applications reviewed within 24–48 hours by admin.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== AUTH MODAL ===== -->
+<div class="overlay" id="auth-overlay" onclick="closeAuth()">
+  <div class="auth-modal" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeAuth()">✕</button>
+    <div class="modal-logo">LOTEX DEPOT</div>
+    <div class="modal-sub" id="auth-mode-label">Sign in to your account</div>
+
+    <div class="role-grid" id="role-grid">
+      <div class="role-card sel" onclick="selectRole('customer', this)">
+        <div class="ri">🛍️</div>
+        <div class="rl">Customer</div>
+      </div>
+      <div class="role-card" onclick="selectRole('affiliate', this)">
+        <div class="ri">🔗</div>
+        <div class="rl">Affiliate</div>
+      </div>
+    </div>
+
+    <div id="auth-err" class="auth-err"></div>
+
+    <div id="register-fields" style="display:none;">
+      <div class="fld">
+        <label>Full Name</label>
+        <input id="reg-name" placeholder="Your full name">
+      </div>
+      <div class="fld">
+        <label>Phone</label>
+        <input id="reg-phone" placeholder="+254...">
+      </div>
+    </div>
+
+    <div class="fld">
+      <label>Email</label>
+      <input id="auth-email" type="email" placeholder="you@email.com">
+    </div>
+    <div class="fld" style="margin-bottom:20px;">
+      <label>Password</label>
+      <input id="auth-pass" type="password" placeholder="••••••••">
+    </div>
+
+    <button class="btn-full orange" id="auth-submit-btn" onclick="doAuth()">SIGN IN</button>
+    <div class="switch-link" id="auth-switch">
+      Don't have an account? <span onclick="toggleAuthMode()">Register</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CART MODAL ===== -->
+<div class="overlay" id="cart-overlay" onclick="closeCart()">
+  <div class="cart-modal" onclick="event.stopPropagation()">
+    <div class="cart-head">
+      <div class="cart-title">🛒 YOUR CART</div>
+      <button class="modal-close" onclick="closeCart()">✕</button>
+    </div>
+    <div class="cart-body" id="cart-body"></div>
+    <div class="cart-foot" id="cart-foot" style="display:none;">
+      <div class="cart-total-row">
+        <div class="ct-label">Total</div>
+        <div class="ct-val" id="cart-total">KES 0</div>
+      </div>
+      <button class="btn-full orange" onclick="openCheckout()">CHECKOUT →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CHECKOUT MODAL ===== -->
+<div class="overlay" id="checkout-overlay" onclick="closeCheckout()">
+  <div class="checkout-modal" onclick="event.stopPropagation()">
+    <div class="checkout-head">
+      <div class="checkout-title">CHECKOUT</div>
+      <button class="modal-close" onclick="closeCheckout()" style="position:absolute; top:20px; right:24px;">✕</button>
+    </div>
+    <div class="checkout-body">
+      <div class="order-summary" id="checkout-summary"></div>
+
+      <div class="section-label">Delivery Details</div>
+
+      <div class="form-row">
+        <div class="cf">
+          <label>Full Name</label>
+          <input id="ch-name" placeholder="Recipient name">
+        </div>
+        <div class="cf">
+          <label>Phone (M-Pesa)</label>
+          <input id="ch-phone" placeholder="+254..." type="tel">
+        </div>
+      </div>
+
+      <div class="form-row-1 cf">
+        <label>Delivery Address</label>
+        <textarea id="ch-address" placeholder="Street, area, city..."></textarea>
+      </div>
+
+      <div class="section-label" style="margin-top:8px;">Payment</div>
+
+      <div class="mpesa-note">
+        📱 <strong>M-Pesa Payment</strong><br>
+        After placing your order, you'll receive an M-Pesa STK push to the number above. Enter your PIN to complete payment. Your order is confirmed once payment goes through.
+      </div>
+
+      <div id="checkout-err" class="auth-err"></div>
+    </div>
+    <div class="checkout-foot">
+      <button class="btn-full orange" id="place-order-btn" onclick="placeOrder()">PLACE ORDER & PAY</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+
+// ===== TOAST =====
+function toast(msg, type = 'success') {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'toast ' + type + ' show';
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ===== SUPABASE =====
+const { createClient } = supabase;
+const sb = createClient(
+  'https://myewthmcvhioswmmnbqp.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15ZXd0aG1jdmhpb3N3bW1uYnFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMDg4MDksImV4cCI6MjA4Nzg4NDgwOX0.M-Bxdlo6ijSBFIfV3kJg6QBDrIyZMSS0Hp0-f7CweoQ'
+);
+
+// ===== STATE =====
+let cart = JSON.parse(localStorage.getItem('lotex_cart') || '[]');
+let currentUser = null;
+let currentRole = 'customer';
+let authMode = 'login';
+let affiliateId = null; // the affiliate whose ref is active
+let refCode = null;
+
+// ===== AFFILIATE REF DETECTION =====
+function detectRef() {
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get('ref');
+  if (ref) {
+    localStorage.setItem('lotex_ref', ref);
+    localStorage.setItem('lotex_ref_time', Date.now());
+  }
+
+  // Check stored ref (valid for 7 days)
+  const stored = localStorage.getItem('lotex_ref');
+  const storedTime = localStorage.getItem('lotex_ref_time');
+  if (stored && storedTime) {
+    const age = Date.now() - parseInt(storedTime);
+    const sevenDays = 7 * 24 * 60 * 60 * 1000;
+    if (age < sevenDays) {
+      refCode = stored;
+      showRefStrip(stored);
+    } else {
+      localStorage.removeItem('lotex_ref');
+      localStorage.removeItem('lotex_ref_time');
+    }
+  }
+}
+
+async function showRefStrip(code) {
+  const { data } = await sb.from('affiliates').select('id, profiles(full_name)').eq('affiliate_code', code).eq('status','approved').single();
+  if (data) {
+    affiliateId = data.id;
+    document.getElementById('aff-strip').style.display = 'flex';
+    document.getElementById('ref-name-strip').textContent = data.profiles?.full_name || code;
+  }
+}
+
+// ===== SESSION =====
+async function checkSession() {
+  const { data } = await sb.auth.getSession();
+  if (data.session) {
+    currentUser = data.session.user;
+    const { data: profile } = await sb.from('profiles').select('role, full_name').eq('id', currentUser.id).single();
+    updateAuthUI(profile);
+  }
+}
+
+function updateAuthUI(profile) {
+  const area = document.getElementById('auth-area');
+  const name = profile?.full_name || currentUser?.email?.split('@')[0] || 'Account';
+  const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
+  area.innerHTML = `
+    <div class="user-menu">
+      <button class="user-btn" onclick="toggleUserMenu()" title="${name}">
+        <div class="user-avatar">${initials}</div>
+        <span class="user-name-label">${name.split(' ')[0]}</span>
+        <span style="font-size:10px; opacity:0.6;">▾</span>
+      </button>
+      <div class="user-dropdown" id="user-dropdown">
+        <div class="dd-header">
+          <div style="font-weight:700; color:var(--text);">${name}</div>
+          <div style="font-size:11px; color:var(--muted); margin-top:2px;">${currentUser.email}</div>
+          <div style="margin-top:6px;">${profile?.role === 'affiliate' ? '<span class="pill orange" style="font-size:9px;">AFFILIATE</span>' : '<span class="pill muted" style="font-size:9px;">CUSTOMER</span>'}</div>
+        </div>
+        <a class="dd-item" onclick="showMyOrders(); toggleUserMenu();">📦 My Orders</a>
+        ${profile?.role === 'affiliate' ? `<a class="dd-item" onclick="window.location.href='lotex-affiliate.html'">🔗 Affiliate Dashboard</a>` : ''}
+        <a class="dd-item danger" onclick="doLogout()">↩ Sign Out</a>
+      </div>
+    </div>`;
+}
+
+function toggleUserMenu() {
+  document.getElementById('user-dropdown')?.classList.toggle('show');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.user-menu')) {
+    document.getElementById('user-dropdown')?.classList.remove('show');
+  }
+});
+
+async function doLogout() {
+  await sb.auth.signOut();
+  currentUser = null;
+  document.getElementById('auth-area').innerHTML = `<button class="auth-btn" onclick="openAuth()">LOG IN</button>`;
+  toast('Signed out', 'info');
+}
+
+// ===== NAVIGATION =====
+function setActivePage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  window.scrollTo(0, 0);
+}
+
+function goHome() {
+  setActivePage('page-home');
+  document.getElementById('nav-home').classList.add('active');
+  loadFeatured();
+}
+
+function showShop(tab) {
+  setActivePage('page-shop');
+  switchShopTab(tab || 'shoes');
+}
+
+let shopLoaded = { shoes: false, clothes: false }; // cleared on tab switch
+
+function switchShopTab(tab) {
+  // Update tab buttons
+  const tabShoes = document.getElementById('tab-shoes');
+  const tabClothes = document.getElementById('tab-clothes');
+  const secShoes = document.getElementById('shop-section-shoes');
+  const secClothes = document.getElementById('shop-section-clothes');
+
+  if (tab === 'shoes') {
+    tabShoes.style.background = 'var(--orange)';
+    tabShoes.style.color = '#000';
+    tabClothes.style.background = 'transparent';
+    tabClothes.style.color = 'var(--muted)';
+    secShoes.style.display = 'block';
+    secClothes.style.display = 'none';
+    shopLoaded.shoes = false;
+  loadShopCategory('shoes');
+  } else {
+    tabClothes.style.background = 'var(--orange)';
+    tabClothes.style.color = '#000';
+    tabShoes.style.background = 'transparent';
+    tabShoes.style.color = 'var(--muted)';
+    secClothes.style.display = 'block';
+    secShoes.style.display = 'none';
+    shopLoaded.clothes = false;
+  loadShopCategory('clothes');
+  }
+}
+
+function showTrack(prefillId) {
+  setActivePage('page-track');
+  document.getElementById('nav-track')?.classList.add('active');
+  if (prefillId) {
+    document.getElementById('track-input').value = prefillId;
+    trackOrder();
+  }
+}
+
+function showApply() {
+  setActivePage('page-apply');
+  // If they already applied this session, show status instead of form
+  const uid = localStorage.getItem('lotex_aff_uid');
+  if (uid) {
+    showAffiliateStatus(uid);
+  }
+}
+
+// ===== PRODUCTS =====
+function formatSizeRange(sizes) {
+  if (!sizes || !sizes.length) return null;
+  // Clothes sizes are strings (S/M/L), shoe sizes are numbers
+  const isClothes = sizes.some(s => isNaN(Number(s)));
+  if (isClothes) return 'Sizes: ' + sizes.join(', ');
+  const nums = sizes.map(Number).filter(n => !isNaN(n)).sort((a,b) => a-b);
+  if (!nums.length) return null;
+  if (nums.length === 1) return 'Size ' + nums[0];
+  const groups = [];
+  let start = nums[0], prev = nums[0];
+  for (let i = 1; i <= nums.length; i++) {
+    if (i === nums.length || nums[i] !== prev + 1) {
+      groups.push(start === prev ? String(start) : start + '\u2013' + prev);
+      if (i < nums.length) { start = nums[i]; prev = nums[i]; }
+    } else { prev = nums[i]; }
+  }
+  return groups.length === 1 && groups[0].includes('\u2013') ? 'Sizes ' + groups[0] : 'Sizes ' + groups.join(', ');
+}
+
+function getDiscountCountdown(expiresAt) {
+  if (!expiresAt) return null;
+  const diff = new Date(expiresAt) - new Date();
+  if (diff <= 0) return null;
+  const h = Math.floor(diff / 3600000);
+  const d = Math.floor(h / 24);
+  if (d > 0) return d + 'd left';
+  if (h > 0) return h + 'h left';
+  const m = Math.floor(diff / 60000);
+  return m + 'm left';
+}
+
+function getEffectivePrice(p) {
+  if (p.discount_percent > 0) {
+    if (p.discount_expires_at && new Date(p.discount_expires_at) < new Date()) return p.price;
+    return Math.round(p.price * (1 - p.discount_percent / 100));
+  }
+  return p.price;
+}
+
+function discountCondText(cond) {
+  const map = { today: '🔥 Today Only', this_week: '📅 This Week', this_weekend: '🎉 This Weekend', no_expiry: '♾️ Sale Price' };
+  return map[cond] || '';
+}
+
+// Store product images in JS map to avoid HTML attribute escaping issues
+// Store product images in JS map to avoid HTML attribute escaping issues
+const productImagesMap = {};
+
+function productCard(p) {
+  const effectivePrice = getEffectivePrice(p);
+  const hasDiscount = p.discount_percent > 0 && effectivePrice < p.price;
+  const outOfStock = p.stock_quantity <= 0;
+  const sizes = p.sizes || [];
+  const colors = p.colors || [];
+  const images = [p.image_url, ...(p.images || [])].filter(Boolean);
+  const countdown = hasDiscount ? getDiscountCountdown(p.discount_expires_at) : null;
+  productImagesMap[p.id] = images;
+  // Store product data for commission rate lookup
+  if (!window._productData) window._productData = {};
+  window._productData[p.id] = p;
+
+  // Collapsible size+color picker - hidden by default, arrow toggles it
+  const hasPicker = sizes.length || colors.length;
+  const pickerHtml = hasPicker ? `
+    <div style="border-top:1px solid var(--border);margin-top:10px;">
+      <button onclick="togglePicker('${p.id}')" style="width:100%;background:none;border:none;padding:8px 0;cursor:pointer;display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+        <span>Select Options</span>
+        <svg id="picker-arrow-${p.id}" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.2s;transform:${p.category === 'clothes' ? 'rotate(180deg)' : 'rotate(0deg)'}"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div id="picker-${p.id}" style="display:${p.category === 'clothes' ? 'block' : 'none'};padding-bottom:8px;">
+        ${sizes.length ? `
+          <div style="font-size:10px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Size</div>
+          <div class="size-grid" id="sizes-${p.id}">
+            ${sizes.map(s => `<button class="size-chip" onclick="selectSize('${p.id}','${s}',this)">${s}</button>`).join('')}
+          </div>` : ''}
+        ${colors.length ? `
+          <div style="font-size:10px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;margin-top:8px;">Color</div>
+          <div class="size-grid" id="colors-${p.id}">
+            ${colors.map(c => `<button class="size-chip" onclick="selectColor('${p.id}','${c}',this)">${c}</button>`).join('')}
+          </div>` : ''}
+      </div>
+    </div>` : '';
+
+  const galleryControls = images.length > 1 ? `
+    <button onclick="switchImg(event,'${p.id}','prev')" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.55);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:18px;z-index:3;display:flex;align-items:center;justify-content:center;line-height:1;">&#8249;</button>
+    <button onclick="switchImg(event,'${p.id}','next')" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.55);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:18px;z-index:3;display:flex;align-items:center;justify-content:center;line-height:1;">&#8250;</button>
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:3;">
+      ${images.map((_, i) => `<span id="dot-${p.id}-${i}" onclick="switchImg(event,'${p.id}',${i})" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${i===0?'var(--gold)':'rgba(255,255,255,0.35)'};cursor:pointer;transition:all 0.2s;"></span>`).join('')}
+    </div>` : '';
+
+  const categoryLabel = p.category && p.category !== 'shoes'
+    ? `<div style="font-size:9px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;font-weight:700;margin-bottom:4px;">${p.category}</div>`
+    : '';
+
+  return `
+    <div class="prod-card">
+      <div class="prod-img" id="prodimg-${p.id}" data-current="0">
+        ${images.length ? `<img src="${images[0]}" alt="${p.name}" loading="lazy" id="img-${p.id}">` : `<div style="font-size:48px;opacity:0.15;color:var(--text);">&#128095;</div>`}
+        ${hasDiscount ? `<div class="discount-badge">${p.discount_percent}% OFF${countdown ? ' &middot; ' + countdown : ''}</div>` : ''}
+        ${galleryControls}
+      </div>
+      <div class="prod-body">
+        ${categoryLabel}
+        <div class="prod-name">${p.name}</div>
+        ${p.description ? `<div style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.5;">${p.description}</div>` : ''}
+        <div class="prod-price-row">
+          <div class="prod-price">KES ${effectivePrice.toLocaleString()}</div>
+          ${hasDiscount ? `<div class="prod-orig">KES ${p.price.toLocaleString()}</div>` : ''}
+        </div>
+        ${hasDiscount ? `<div class="prod-discount-label">${discountCondText(p.discount_condition)}</div>` : ''}
+        ${sizes.length ? `<div style="font-size:10px;color:var(--orange);font-weight:600;margin-bottom:6px;letter-spacing:1px;">${formatSizeRange(sizes)}</div>` : ''}
+        ${colors.length ? `<div style="font-size:10px;color:var(--muted);margin-bottom:8px;">${colors.join(' &middot; ')}</div>` : ''}
+        ${pickerHtml}
+        <button class="add-cart-btn" ${outOfStock ? 'disabled' : ''} onclick="addToCartWithSize('${p.id}','${p.name.replace(/'/g,"\\'")}',${effectivePrice},'${(images[0]||'').replace(/'/g,"\\'")}',${sizes.length > 0})">
+          ${outOfStock ? 'OUT OF STOCK' : '+ ADD TO CART'}
+        </button>
+      </div>
+    </div>`;
+}
+
+
+async function loadFeatured() {
+  // Count all products for hero stat
+  sb.from('products').select('id', { count: 'exact' }).eq('is_active', true).then(({count}) => {
+    const el = document.getElementById('hero-prod-count');
+    if (el && count) el.textContent = count;
+  });
+
+  // Load featured shoes
+  const shoesGrid = document.getElementById('featured-shoes-grid');
+  const { data: shoes } = await sb.from('products').select('*')
+    .eq('is_active', true).eq('is_featured', true)
+    .or('category.eq.shoes,category.eq.accessories,category.is.null')
+    .order('created_at', { ascending: false }).limit(4);
+
+  if (!shoes?.length) {
+    // fallback: show latest 4 shoes even if none marked featured
+    const { data: fallback } = await sb.from('products').select('*')
+      .eq('is_active', true)
+      .or('category.eq.shoes,category.eq.accessories,category.is.null')
+      .order('created_at', { ascending: false }).limit(4);
+    shoesGrid.innerHTML = fallback?.length
+      ? fallback.map(productCard).join('')
+      : `<div class="empty-state"><p>No shoes yet — check back soon!</p></div>`;
+  } else {
+    shoesGrid.innerHTML = shoes.map(productCard).join('');
+  }
+
+  // Load featured clothes
+  const clothesGrid = document.getElementById('featured-clothes-grid');
+  const clothesSection = document.getElementById('featured-clothes-section');
+  const { data: clothes } = await sb.from('products').select('*')
+    .eq('is_active', true).eq('is_featured', true).eq('category', 'clothes')
+    .order('created_at', { ascending: false }).limit(4);
+
+  if (clothes?.length) {
+    clothesSection.style.display = 'block';
+    clothesGrid.innerHTML = clothes.map(productCard).join('');
+  } else {
+    // Check if any clothes exist at all — show section with latest even if not featured
+    const { data: anyClothes } = await sb.from('products').select('*')
+      .eq('is_active', true).eq('category', 'clothes')
+      .order('created_at', { ascending: false }).limit(4);
+    if (anyClothes?.length) {
+      clothesSection.style.display = 'block';
+      clothesGrid.innerHTML = anyClothes.map(productCard).join('');
+    }
+  }
+}
+
+async function loadShopCategory(cat) {
+  const gridId = cat === 'shoes' ? 'shop-grid-shoes' : 'shop-grid-clothes';
+  const grid = document.getElementById(gridId);
+  grid.innerHTML = `<div class="loading"><div class="spinner"></div>Loading...</div>`;
+
+  // shoes category = 'shoes' + accessories, clothes = 'clothes'
+  let query = sb.from('products').select('*').eq('is_active', true).order('created_at', { ascending: false });
+  if (cat === 'shoes') {
+    query = query.or('category.eq.shoes,category.eq.accessories,category.is.null');
+  } else {
+    query = query.eq('category', 'clothes');
+  }
+
+  const { data } = await query;
+  shopLoaded[cat] = true;
+
+  const emptyMsg = cat === 'shoes' ? 'No shoes yet — check back soon!' : 'No clothes yet — check back soon!';
+  if (!data?.length) {
+    grid.innerHTML = `<div class="empty-state"><p>${emptyMsg}</p></div>`;
+    return;
+  }
+  grid.innerHTML = data.map(productCard).join('');
+}
+
+// Legacy - keep for any old references
+async function loadShop() { switchShopTab('shoes'); }
+
+// ===== CART =====
+function saveCart() { localStorage.setItem('lotex_cart', JSON.stringify(cart)); }
+
+function updateCartCount() {
+  const total = cart.reduce((s, i) => s + i.qty, 0);
+  document.getElementById('cart-count').textContent = total;
+}
+
+// Image gallery switcher
+function switchImg(e, productId, dir) {
+  e.stopPropagation();
+  const wrap = document.getElementById('prodimg-' + productId);
+  if (!wrap) return;
+  const images = productImagesMap[productId] || [];
+  if (images.length <= 1) return;
+  let current = parseInt(wrap.dataset.current || 0);
+  let next;
+  if (dir === 'prev') {
+    next = (current - 1 + images.length) % images.length;
+  } else if (dir === 'next') {
+    next = (current + 1) % images.length;
+  } else {
+    // direct dot index
+    next = parseInt(dir);
+  }
+  wrap.dataset.current = next;
+  const img = document.getElementById('img-' + productId);
+  if (img) {
+    img.style.opacity = '0';
+    setTimeout(() => { img.src = images[next]; img.style.opacity = '1'; }, 150);
+  }
+  images.forEach((_, i) => {
+    const dot = document.getElementById('dot-' + productId + '-' + i);
+    if (dot) dot.style.background = i === next ? 'var(--gold)' : 'rgba(255,255,255,0.35)';
+  });
+}
+
+// Track selected sizes and colors per product
+const selectedSizes = {};
+const selectedColors = {};
+
+function selectColor(productId, color, el) {
+  selectedColors[productId] = color;
+  const grid = document.getElementById('colors-' + productId);
+  if (grid) grid.querySelectorAll('.size-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function togglePicker(productId) {
+  const picker = document.getElementById('picker-' + productId);
+  const arrow = document.getElementById('picker-arrow-' + productId);
+  if (!picker) return;
+  const open = picker.style.display === 'none';
+  picker.style.display = open ? 'block' : 'none';
+  if (arrow) arrow.style.transform = open ? 'rotate(180deg)' : 'rotate(0deg)';
+}
+
+function selectSize(productId, size, el) {
+  selectedSizes[productId] = size;
+  // Update UI
+  const grid = document.getElementById('sizes-' + productId);
+  if (grid) grid.querySelectorAll('.size-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function addToCartWithSize(id, name, price, imageUrl, requiresSize) {
+  if (requiresSize && !selectedSizes[id]) {
+    // Open the picker and shake it so customer sees they need to pick a size
+    const picker = document.getElementById('picker-' + id);
+    const arrow = document.getElementById('picker-arrow-' + id);
+    if (picker) {
+      picker.style.display = 'block';
+      if (arrow) arrow.style.transform = 'rotate(180deg)';
+      // Shake animation
+      picker.style.outline = '2px solid var(--orange)';
+      picker.style.borderRadius = '8px';
+      setTimeout(() => { picker.style.outline = 'none'; }, 1500);
+    }
+    toast('👆 Select a size first!', 'error');
+    return;
+  }
+  const size = selectedSizes[id] || null;
+  const color = selectedColors[id] || null;
+  const cartKey = [id, size, color].filter(Boolean).join('-');
+  const existing = cart.find(i => i.cartKey === cartKey);
+  if (existing) {
+    existing.qty++;
+  } else {
+    const prodData = window._productData && window._productData[id];
+  const commRate = prodData ? (prodData.commission_rate || 15) : 15;
+  cart.push({ cartKey, id, name, price, imageUrl, size, color, qty: 1, commRate });
+  }
+  saveCart();
+  updateCartCount();
+  // Flash the cart button
+  const cartBtn = document.querySelector('.cart-btn');
+  if (cartBtn) {
+    cartBtn.style.background = 'var(--gold)';
+    cartBtn.style.transform = 'scale(1.1)';
+    setTimeout(() => {
+      cartBtn.style.background = '';
+      cartBtn.style.transform = '';
+    }, 400);
+  }
+  toast('🛒 ' + name + (size ? ' · Size ' + size : '') + (color ? ' · ' + color : '') + ' added!', 'success');
+}
+
+function addToCart(id, name, price, imageUrl) {
+  const existing = cart.find(i => i.id === id && !i.size);
+  if (existing) {
+    existing.qty++;
+  } else {
+    cart.push({ cartKey: id, id, name, price, imageUrl, size: null, qty: 1 });
+  }
+  saveCart();
+  updateCartCount();
+  toast('✅ ' + name + ' added to cart!', 'success');
+}
+
+function removeFromCart(cartKey) {
+  cart = cart.filter(i => i.cartKey !== cartKey);
+  saveCart();
+  updateCartCount();
+  renderCart();
+}
+
+function changeQty(cartKey, delta) {
+  const item = cart.find(i => i.cartKey === cartKey);
+  if (!item) return;
+  item.qty = Math.max(1, item.qty + delta);
+  saveCart();
+  updateCartCount();
+  renderCart();
+}
+
+function renderCart() {
+  const body = document.getElementById('cart-body');
+  const foot = document.getElementById('cart-foot');
+  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  document.getElementById('cart-total').textContent = `KES ${total.toLocaleString()}`;
+
+  if (!cart.length) {
+    body.innerHTML = `<div class="cart-empty"><div class="icon">🛒</div><p>Your cart is empty</p></div>`;
+    foot.style.display = 'none';
+    return;
+  }
+
+  foot.style.display = 'block';
+  body.innerHTML = cart.map(item => `
+    <div class="cart-item">
+      <div class="ci-img">
+        ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.name}">` : '&#9651;'}
+      </div>
+      <div class="ci-info">
+        <div class="ci-name">${item.name}${item.size ? ` <span style="color:var(--orange);font-size:11px;">· Size ${item.size}</span>` : ''}</div>
+        <div class="ci-price">KES ${(item.price * item.qty).toLocaleString()}</div>
+      </div>
+      <div class="ci-qty">
+        <button class="qty-btn" onclick="changeQty('${item.cartKey}',-1)">−</button>
+        <span class="qty-num">${item.qty}</span>
+        <button class="qty-btn" onclick="changeQty('${item.cartKey}',1)">+</button>
+      </div>
+      <button class="ci-remove" onclick="removeFromCart('${item.cartKey}')">✕</button>
+    </div>`).join('');;
+}
+
+function openCart() {
+  renderCart();
+  document.getElementById('cart-overlay').classList.add('show');
+}
+
+function closeCart() { document.getElementById('cart-overlay').classList.remove('show'); }
+
+// ===== CHECKOUT =====
+function openCheckout() {
+  if (!cart.length) { toast('Your cart is empty', 'error'); return; }
+  closeCart();
+
+  // Pre-fill if logged in
+  if (currentUser) {
+    sb.from('profiles').select('full_name, phone').eq('id', currentUser.id).single().then(({ data }) => {
+      if (data?.full_name) document.getElementById('ch-name').value = data.full_name;
+      if (data?.phone) document.getElementById('ch-phone').value = data.phone;
+    });
+  }
+
+  // Build summary
+  const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const delivery = 200;
+  const total = subtotal + delivery;
+  const summary = document.getElementById('checkout-summary');
+  summary.innerHTML = `
+    <div class="os-title">Order Summary</div>
+    ${cart.map(i => `
+      <div class="os-item">
+        <span>${i.name} × ${i.qty}</span>
+        <span style="color:var(--gold);">KES ${(i.price * i.qty).toLocaleString()}</span>
+      </div>`).join('')}
+    <div class="os-item">
+      <span style="color:var(--muted);">🚚 Delivery (Nationwide)</span>
+      <span style="color:var(--muted);">KES 200</span>
+    </div>
+    <div class="os-total">
+      <span class="os-total-label">TOTAL</span>
+      <span class="os-total-val">KES ${total.toLocaleString()}</span>
+    </div>`;
+
+  document.getElementById('checkout-overlay').classList.add('show');
+}
+
+function closeCheckout() { document.getElementById('checkout-overlay').classList.remove('show'); }
+
+async function placeOrder() {
+  const name = document.getElementById('ch-name').value.trim();
+  const phone = document.getElementById('ch-phone').value.trim();
+  const address = document.getElementById('ch-address').value.trim();
+
+  const errEl = document.getElementById('checkout-err');
+  errEl.style.display = 'none';
+
+  if (!name || !phone || !address) {
+    errEl.textContent = 'Please fill in all delivery details';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('place-order-btn');
+  btn.disabled = true;
+  btn.textContent = 'PLACING ORDER...';
+
+  const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const total = subtotal + 200; // KES 200 flat delivery
+
+  // Create order
+  const orderPayload = {
+    customer_id: currentUser?.id || null,
+    affiliate_id: affiliateId || null,
+    status: 'pending',
+    total_amount: total,
+    delivery_name: name,
+    delivery_phone: phone,
+    delivery_address: address
+  };
+
+  const { data: order, error } = await sb.from('orders').insert(orderPayload).select().single();
+
+  if (error) {
+    errEl.textContent = 'Error placing order: ' + error.message;
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'PLACE ORDER & PAY';
+    return;
+  }
+
+  // Insert order items & calculate commissions
+  const items = cart.map(i => ({
+    order_id: order.id,
+    product_id: i.id,
+    quantity: i.qty,
+    unit_price: i.price,
+    commission_earned: affiliateId ? Math.round(i.price * i.qty * (i.commRate || 15) / 100) : 0
+  }));
+  // Store sizes + colors in order notes
+  const itemNotes = cart.filter(i => i.size || i.color).map(i => {
+    let note = i.name;
+    if (i.size) note += ' [Size: ' + i.size + ']';
+    if (i.color) note += ' [Color: ' + i.color + ']';
+    return note;
+  }).join(' | ');
+  if (itemNotes) await sb.from('orders').update({ notes: itemNotes }).eq('id', order.id);
+
+  await sb.from('order_items').insert(items);
+
+  // Create commission record if affiliate
+  if (affiliateId) {
+    const totalComm = items.reduce((s, i) => s + i.commission_earned, 0);
+    await sb.from('commissions').insert({
+      affiliate_id: affiliateId,
+      order_id: order.id,
+      amount: totalComm,
+      status: 'pending'
+    });
+    // Update affiliate total earnings
+    const { data: aff } = await sb.from('affiliates').select('total_earnings').eq('id', affiliateId).single();
+    await sb.from('affiliates').update({ total_earnings: (aff?.total_earnings || 0) + totalComm }).eq('id', affiliateId);
+  }
+
+  // Decrease stock
+  for (const item of cart) {
+    const { data: prod } = await sb.from('products').select('stock_quantity').eq('id', item.id).single();
+    if (prod) {
+      await sb.from('products').update({ stock_quantity: Math.max(0, prod.stock_quantity - item.qty) }).eq('id', item.id);
+    }
+  }
+
+  // Clear cart
+  cart = [];
+  saveCart();
+  updateCartCount();
+
+  // Show success
+  closeCheckout();
+  document.getElementById('checkout-overlay').classList.remove('show');
+
+  // Show order ID
+  const shortId = 'LTX-' + order.id.slice(0,8).toUpperCase();
+  showSuccessModal(shortId, order.id, total);
+
+  btn.disabled = false;
+  btn.textContent = 'PLACE ORDER & PAY';
+}
+
+function showSuccessModal(shortId, fullId, total) {
+  const overlay = document.getElementById('cart-overlay');
+  document.getElementById('cart-body').innerHTML = `
+    <div class="success-box">
+      <div style="font-size:36px; margin-bottom:8px;">🎉</div>
+      <div class="success-title">ORDER PLACED!</div>
+      <div style="font-size:12px; color:var(--muted); margin-bottom:20px; letter-spacing:1px;">Order ID: <strong style="color:var(--gold);">${shortId}</strong></div>
+
+      <div style="background:var(--card2); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:20px; text-align:left;">
+        <div style="font-size:10px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:12px;">Pay via M-Pesa → Lipa na M-Pesa</div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border);">
+          <span style="font-size:12px; color:var(--muted);">PayBill Number</span>
+          <span style="font-size:18px; font-weight:800; color:var(--orange); letter-spacing:3px;">247247</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border);">
+          <span style="font-size:12px; color:var(--muted);">Account Number</span>
+          <span style="font-size:14px; font-weight:800; color:var(--gold);">1090186472773</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border);">
+          <span style="font-size:12px; color:var(--muted);">Reference / Remarks</span>
+          <span style="font-size:13px; font-weight:800; color:var(--text);">${shortId}</span>
+        </div>
+        <div style="padding:12px 0 0;">
+          <div style="font-size:12px; color:var(--text); line-height:2.2;">
+            1. Open <strong>M-Pesa</strong> → <strong>Lipa na M-Pesa</strong><br>
+            2. Select <strong>Pay Bill</strong><br>
+            3. Business No: <strong style="color:var(--orange);">247247</strong><br>
+            4. Account No: <strong style="color:var(--gold);">1090186472773</strong><br>
+            5. Amount: <strong>exact order total</strong><br>
+            6. Remarks: <strong style="color:var(--text);">${shortId}</strong><br>
+            7. Enter PIN & confirm
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size:11px; color:var(--muted); margin-bottom:20px; line-height:1.6;">
+        Once we confirm your payment, your order will be processed and shipped. Save your Order ID to track delivery.
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label style="font-size:10px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; display:block; margin-bottom:8px;">Your M-Pesa Phone Number</label>
+        <input id="mpesa-phone" type="tel" placeholder="e.g. 0712345678" style="width:100%; background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; color:var(--text); font-family:'Montserrat',sans-serif; font-size:14px; outline:none; box-sizing:border-box;" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border)'">
+      </div>
+      <button class="btn-full orange" id="stk-btn" onclick="initiateStkPush('${fullId}', '${shortId}', ${total}, this)" style="margin-bottom:10px;">📲 REQUEST M-PESA PAYMENT</button>
+      <button class="btn-full" onclick="closeCart();" style="background:var(--card2); border:1px solid var(--border); color:var(--muted);">PAY LATER</button>
+    </div>`;
+  document.getElementById('cart-foot').style.display = 'none';
+  document.getElementById('cart-overlay').classList.add('show');
+}
+
+async function markPaymentSent(orderId, btn) {
+  btn.disabled = true;
+  btn.textContent = 'Confirming...';
+  await sb.from('orders').update({ status: 'payment_pending' }).eq('id', orderId);
+  const shortId = 'LTX-' + orderId.slice(0,8).toUpperCase();
+  document.getElementById('cart-body').innerHTML = `
+    <div class="success-box" style="text-align:center; padding:40px 20px;">
+      <div style="font-size:48px; margin-bottom:16px;">✅</div>
+      <div class="success-title" style="margin-bottom:12px;">PAYMENT NOTED!</div>
+      <div style="font-size:13px; color:var(--muted); line-height:1.8;">
+        We'll verify your M-Pesa payment and process your order within <strong style="color:var(--orange);">30 minutes</strong>.<br><br>
+        You'll be notified once confirmed.
+      </div>
+      <button class="btn-full orange" onclick="closeCart(); showTrack('${shortId}');" style="margin-top:24px;">TRACK MY ORDER</button>
+    </div>`;
+}
+
+// ===== ORDER TRACKING =====
+async function trackOrder() {
+  const input = document.getElementById('track-input').value.trim();
+  const resultEl = document.getElementById('track-result');
+  if (!input) { toast('Enter an order ID', 'error'); return; }
+
+  resultEl.innerHTML = `<div class="loading"><div class="spinner"></div>Searching...</div>`;
+
+  // Accept short ID (LTX-XXXXXXXX) or full UUID
+  let query = sb.from('orders').select('*');
+  if (input.startsWith('LTX-')) {
+    const uuid_part = input.replace('LTX-', '').toLowerCase();
+    const { data: all } = await sb.from('orders').select('*');
+    const found = (all || []).find(o => o.id.startsWith(uuid_part));
+    if (!found) { resultEl.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><p>Order not found. Check your ID.</p></div>`; return; }
+    renderTrack(found, resultEl);
+  } else {
+    const { data } = await query.eq('id', input).single();
+    if (!data) { resultEl.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><p>Order not found.</p></div>`; return; }
+    renderTrack(data, resultEl);
+  }
+}
+
+function renderTrack(order, el) {
+  const trackSteps = ['pending','confirmed','shipped','delivered'];
+  const trackLabels = ['Ordered','Confirmed','Shipped','Delivered'];
+  const trackIdx = Math.max(0, trackSteps.indexOf(order.status));
+  const shortId = 'LTX-' + order.id.slice(0,8).toUpperCase();
+  const isCancelled = order.status === 'cancelled';
+  const statusColors = { pending:'var(--muted)', payment_pending:'var(--orange)', confirmed:'#3b82f6', shipped:'#8b5cf6', delivered:'#22c55e', cancelled:'var(--red)' };
+  const statusLabels = { pending:'Order Placed', payment_pending:'Awaiting Payment', confirmed:'Confirmed', shipped:'Out for Delivery', delivered:'Delivered ✓', cancelled:'Cancelled' };
+  const color = statusColors[order.status] || 'var(--muted)';
+
+  el.innerHTML = `
+    <div style="background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden;">
+      <div style="padding:20px 24px; background:var(--card2); display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border);">
+        <div>
+          <div style="font-family:'Bebas Neue',cursive; font-size:22px; color:var(--gold); letter-spacing:2px;">${shortId}</div>
+          <div style="font-size:11px; color:var(--muted); margin-top:2px;">${new Date(order.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'})}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-family:'Bebas Neue',cursive; font-size:26px; color:var(--orange);">KES ${order.total_amount?.toLocaleString()}</div>
+          <div style="display:inline-block; background:${color}22; border:1px solid ${color}44; border-radius:20px; padding:3px 10px; font-size:10px; font-weight:700; color:${color}; margin-top:4px;">${(statusLabels[order.status]||order.status).toUpperCase()}</div>
+        </div>
+      </div>
+
+      <div style="padding:24px;">
+        ${!isCancelled ? `
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; position:relative; margin-bottom:20px;">
+          <div style="position:absolute; top:14px; left:14px; right:14px; height:2px; background:var(--border); z-index:0;"></div>
+          <div style="position:absolute; top:14px; left:14px; height:2px; width:${trackIdx === 0 ? '0%' : trackIdx === 1 ? '33%' : trackIdx === 2 ? '66%' : '100%'}; background:var(--orange); z-index:1;"></div>
+          ${trackSteps.map((s,i) => {
+            const done = i < trackIdx;
+            const active = i === trackIdx;
+            return `<div style="display:flex;flex-direction:column;align-items:center;z-index:2;flex:1;">
+              <div style="width:28px;height:28px;border-radius:50%;border:2px solid ${done||active?'var(--orange)':'var(--border)'};background:${done?'var(--orange)':'var(--card)'};display:flex;align-items:center;justify-content:center;margin-bottom:6px;">
+                ${done?'<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':active?'<div style="width:8px;height:8px;border-radius:50%;background:var(--orange);"></div>':''}
+              </div>
+              <div style="font-size:9px;letter-spacing:1px;color:${done||active?'var(--text)':'var(--muted)'};font-weight:${active?'700':'400'};text-align:center;">${trackLabels[i]}</div>
+            </div>`;
+          }).join('')}
+        </div>
+        ${order.status === 'payment_pending' ? `<div style="background:rgba(255,107,0,0.08);border:1px solid rgba(255,107,0,0.2);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--orange);font-weight:600;margin-bottom:16px;">💳 Payment pending · PayBill: <strong>247247</strong> · Account: <strong>1090186472773</strong> · Ref: <strong>${shortId}</strong></div>`:''}
+        ` : `<div style="font-size:13px;color:var(--red);margin-bottom:16px;">This order was cancelled.</div>`}
+
+        <div style="font-size:12px; color:var(--muted); line-height:1.8;">
+          <strong style="color:var(--text);">Deliver to:</strong> ${order.delivery_name} · ${order.delivery_phone||''}<br>
+          <strong style="color:var(--text);">Address:</strong> ${order.delivery_address||''}
+          ${order.notes ? `<br><strong style="color:var(--text);">Items:</strong> ${order.notes}` : ''}
+        </div>
+      </div>
+    </div>`;
+}
+
+// ===== AUTH =====
+function openAuth() { document.getElementById('auth-overlay').classList.add('show'); }
+function closeAuth() { document.getElementById('auth-overlay').classList.remove('show'); }
+
+function selectRole(role, el) {
+  currentRole = role;
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function toggleAuthMode() {
+  authMode = authMode === 'login' ? 'register' : 'login';
+  const isReg = authMode === 'register';
+  document.getElementById('auth-mode-label').textContent = isReg ? 'Create your account' : 'Sign in to your account';
+  document.getElementById('auth-submit-btn').textContent = isReg ? 'CREATE ACCOUNT' : 'SIGN IN';
+  document.getElementById('auth-switch').innerHTML = isReg
+    ? `Already have an account? <span onclick="toggleAuthMode()">Sign In</span>`
+    : `Don't have an account? <span onclick="toggleAuthMode()">Register</span>`;
+  document.getElementById('register-fields').style.display = isReg ? 'block' : 'none';
+  document.getElementById('auth-err').style.display = 'none';
+}
+
+async function doAuth() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-pass').value;
+  const errEl = document.getElementById('auth-err');
+  const btn = document.getElementById('auth-submit-btn');
+
+  errEl.style.display = 'none';
+  if (!email || !pass) { errEl.textContent = 'Fill in all fields'; errEl.style.display = 'block'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'LOADING...';
+
+  if (authMode === 'login') {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+    if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'SIGN IN'; return; }
+    currentUser = data.user;
+    const { data: profile } = await sb.from('profiles').select('role, full_name').eq('id', currentUser.id).single();
+    updateAuthUI(profile);
+    closeAuth();
+    toast(`Welcome back, ${profile?.full_name || email.split('@')[0]}!`, 'success');
+  } else {
+    const name = document.getElementById('reg-name').value.trim();
+    const phone = document.getElementById('reg-phone').value.trim();
+    if (!name) { errEl.textContent = 'Enter your full name'; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'CREATE ACCOUNT'; return; }
+
+    const { data, error } = await sb.auth.signUp({ email, password: pass, options: { data: { full_name: name } } });
+    if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'CREATE ACCOUNT'; return; }
+
+    // Upsert profile with phone & role
+    await sb.from('profiles').upsert({
+      id: data.user.id,
+      email,
+      full_name: name,
+      phone,
+      role: currentRole
+    }, { onConflict: 'id' });
+
+    // If affiliate, create affiliate record
+    if (currentRole === 'affiliate') {
+      await sb.from('affiliates').insert({
+        user_id: data.user.id,
+        affiliate_code: 'PENDING-' + data.user.id.slice(0,6).toUpperCase(),
+        status: 'pending'
+      });
+    }
+
+    currentUser = data.user;
+    updateAuthUI({ full_name: name, role: currentRole });
+    closeAuth();
+    toast(currentRole === 'affiliate' ? '✅ Application submitted! Admin will review within 48h.' : '✅ Account created! Welcome to Lotex Depot.', 'success');
+  }
+
+  btn.disabled = false;
+  btn.textContent = authMode === 'login' ? 'SIGN IN' : 'CREATE ACCOUNT';
+}
+
+// ===== AFFILIATE APPLY PAGE =====
+async function submitApplication() {
+  const name = document.getElementById('apply-name').value.trim();
+  const email = document.getElementById('apply-email').value.trim();
+  const phone = document.getElementById('apply-phone').value.trim();
+  const pass = document.getElementById('apply-pass').value;
+  const passConfirm = document.getElementById('apply-pass-confirm').value;
+  const errEl = document.getElementById('apply-err');
+  const btn = document.getElementById('apply-btn');
+
+  errEl.style.display = 'none';
+
+  if (!name || !email || !phone || !pass || !passConfirm) {
+    errEl.textContent = 'Fill in all required fields';
+    errEl.style.display = 'block'; return;
+  }
+  if (pass !== passConfirm) {
+    errEl.textContent = 'Passwords do not match!';
+    errEl.style.display = 'block'; return;
+  }
+  if (pass.length < 6) {
+    errEl.textContent = 'Password must be at least 6 characters';
+    errEl.style.display = 'block'; return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'SUBMITTING...';
+
+  const { data, error } = await sb.auth.signUp({
+    email, password: pass,
+    options: { data: { full_name: name, phone } }
+  });
+
+  if (error) {
+    errEl.textContent = error.message;
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'SUBMIT APPLICATION';
+    return;
+  }
+
+  const uid = data.user.id;
+
+  // Upsert profile with all fields
+  const { error: profErr } = await sb.from('profiles').upsert({
+    id: uid,
+    email,
+    full_name: name,
+    phone,
+    role: 'affiliate'
+  }, { onConflict: 'id' });
+
+  if (profErr) console.error('Profile error:', profErr);
+
+  // Create affiliate record
+  const { error: affErr } = await sb.from('affiliates').insert({
+    user_id: uid,
+    affiliate_code: 'PENDING-' + uid.slice(0,6).toUpperCase(),
+    status: 'pending'
+  });
+
+  if (affErr) console.error('Affiliate error:', affErr);
+
+  btn.disabled = false;
+  btn.textContent = 'SUBMIT APPLICATION';
+
+  // Store uid so status can be checked
+  localStorage.setItem('lotex_aff_uid', uid);
+  showAffiliateStatus(uid);
+}
+
+function affiliateStatusScreen(status) {
+  const screens = {
+    pending: `
+      <div style="text-align:center; padding:80px 40px;">
+        <div style="font-size:64px; margin-bottom:20px;">&#9203;</div>
+        <div style="font-family:'Bebas Neue',cursive; font-size:40px; color:var(--gold); letter-spacing:3px; margin-bottom:12px;">APPLICATION SENT!</div>
+        <div style="font-size:14px; color:var(--muted); line-height:1.7; max-width:400px; margin:0 auto;">
+          Your application is under review.<br><br>
+          The Lotex Depot team will get back to you within <strong style="color:var(--gold);">24-48 hours</strong>.
+          <br><br>
+          <span style="color:var(--orange); font-size:12px;">Come back here anytime to check your status.</span>
+        </div>
+        <button onclick="showApply()" style="margin-top:28px; background:transparent; border:1px solid var(--border); color:var(--muted); padding:10px 24px; border-radius:6px; font-family:'Montserrat',sans-serif; font-size:12px; font-weight:700; cursor:pointer; letter-spacing:1px;">CHECK STATUS AGAIN</button>
+      </div>`,
+    approved: `
+      <div style="text-align:center; padding:80px 40px;">
+        <div style="font-size:64px; margin-bottom:20px;">&#127881;</div>
+        <div style="font-family:'Bebas Neue',cursive; font-size:40px; color:var(--gold); letter-spacing:3px; margin-bottom:12px;">YOU&#39;RE APPROVED!</div>
+        <div style="font-size:14px; color:var(--muted); line-height:1.7; max-width:400px; margin:0 auto; margin-bottom:28px;">
+          Welcome to the Lotex Depot affiliate program! &#127881;<br><br>
+          Log in to your affiliate dashboard to get your unique link and start earning commission.
+        </div>
+        <a href="lotex-affiliate.html" style="display:inline-block; background:var(--orange); color:#000; padding:16px 36px; border-radius:8px; font-family:'Montserrat',sans-serif; font-size:13px; font-weight:800; letter-spacing:2px; text-transform:uppercase; text-decoration:none; box-shadow:0 0 24px rgba(255,107,0,0.3);">
+          GO TO MY DASHBOARD &#8594;
+        </a>
+      </div>`,
+    rejected: `
+      <div style="text-align:center; padding:80px 40px;">
+        <div style="font-size:64px; margin-bottom:20px;">&#128532;</div>
+        <div style="font-family:'Bebas Neue',cursive; font-size:40px; color:var(--red); letter-spacing:3px; margin-bottom:12px;">NOT APPROVED</div>
+        <div style="font-size:14px; color:var(--muted); line-height:1.7; max-width:400px; margin:0 auto;">
+          Unfortunately your affiliate application was not approved at this time.<br><br>
+          For more information please contact Lotex Depot directly.
+        </div>
+      </div>`
+  };
+  return screens[status] || screens.pending;
+}
+
+async function showAffiliateStatus(uid) {
+  const section = document.querySelector('#page-apply > .section');
+  section.innerHTML = `<div style="text-align:center; padding:80px 40px; color:var(--muted);">Checking status...</div>`;
+
+  const { data } = await sb.from('affiliates').select('status').eq('user_id', uid).single();
+  const status = data?.status || 'pending';
+  section.innerHTML = affiliateStatusScreen(status);
+}
+
+// ===== INIT =====
+window.addEventListener('load', () => {
+  detectRef();
+  checkSession();
+  updateCartCount();
+  loadFeatured();
+});
+
+// ===== SUPPORT =====
+async function showSupport() {
+  setActivePage('page-support');
+  // Clear the unread dot when customer opens support
+  const dot = document.getElementById('support-notif-dot');
+  if (dot) dot.style.display = 'none';
+
+  // If user is logged in, check if they have an existing open ticket
+  let userId = null;
+  try { userId = (await sb.auth.getUser()).data?.user?.id || null; } catch(e) {}
+
+  // Pre-fill name/email if logged in
+  if (userId) {
+    const { data: prof } = await sb.from('profiles').select('full_name, email').eq('id', userId).single();
+    if (prof) {
+      const nameEl = document.getElementById('support-name');
+      const emailEl = document.getElementById('support-email');
+      if (nameEl && !nameEl.value) nameEl.value = prof.full_name || '';
+      if (emailEl && !emailEl.value) emailEl.value = prof.email || '';
+    }
+  }
+
+  if (userId) {
+    // Logged-in: fetch their latest open ticket from DB
+    const { data: existing } = await sb.from('support_messages')
+      .select('*').eq('user_id', userId).eq('status', 'open')
+      .order('created_at', { ascending: false }).limit(1).single();
+    if (existing) {
+      localStorage.setItem('lotex_support_id', existing.id);
+      localStorage.setItem('lotex_support_msg', existing.message);
+      localStorage.setItem('lotex_support_time', existing.created_at);
+      restoreSupportThread(existing.id, existing.message, existing.created_at);
+      return;
+    }
+    // Also check resolved tickets - show history
+    const { data: resolved } = await sb.from('support_messages')
+      .select('*').eq('user_id', userId).eq('status','resolved')
+      .order('created_at', { ascending: false }).limit(1).single();
+    if (resolved) {
+      // Show resolved banner + option to start new
+      const thread = document.getElementById('support-thread');
+      const formArea = document.getElementById('support-form-area');
+      formArea.style.display = 'none';
+      thread.style.display = 'block';
+      thread.innerHTML = `
+        <div style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:12px 16px;margin-bottom:16px;text-align:center;">
+          <div style="font-size:12px;font-weight:700;color:#22c55e;margin-bottom:4px;">✓ Your last issue was resolved</div>
+          <div style="font-size:11px;color:var(--muted);">${resolved.message.slice(0,80)}${resolved.message.length > 80 ? '...' : ''}</div>
+        </div>
+        <button onclick="startNewSupportChat()" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--text);font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--border)'">+ START NEW CONVERSATION</button>`;
+      return;
+    }
+  } else {
+    // Not logged in: use localStorage
+    const savedId = localStorage.getItem('lotex_support_id');
+    const savedMsg = localStorage.getItem('lotex_support_msg');
+    const savedTime = localStorage.getItem('lotex_support_time');
+    if (savedId && savedMsg) {
+      restoreSupportThread(savedId, savedMsg, savedTime);
+      return;
+    }
+  }
+  // No existing ticket - show form
+  startNewSupportChat();
+}
+
+function startNewSupportChat() {
+  localStorage.removeItem('lotex_support_id');
+  localStorage.removeItem('lotex_support_msg');
+  localStorage.removeItem('lotex_support_time');
+  if (replyPollInterval) { clearInterval(replyPollInterval); replyPollInterval = null; }
+  document.getElementById('support-thread').style.display = 'none';
+  document.getElementById('support-reply-area').style.display = 'none';
+  document.getElementById('support-form-area').style.display = 'block';
+  document.getElementById('support-message').value = '';
+  document.querySelectorAll('.prompt-chip').forEach(c => c.classList.remove('selected'));
+}
+
+function restoreSupportThread(msgId, originalMsg, sentAt) {
+  document.getElementById('support-form-area').style.display = 'none';
+  document.getElementById('support-thread').style.display = 'block';
+  document.getElementById('support-reply-area').style.display = 'block';
+  // Fetch full thread from DB (not from textarea which is now hidden)
+  sb.from('support_replies').select('*').eq('message_id', msgId).order('created_at', { ascending: true })
+    .then(({ data: replies }) => {
+      const all = [
+        { sender: 'customer', body: originalMsg, created_at: sentAt },
+        ...(replies || [])
+      ];
+      renderSupportThread(all);
+    });
+  startReplyPolling(msgId, originalMsg, sentAt);
+}
+
+function scrollToChat() {
+  document.getElementById('chat-anchor').scrollIntoView({ behavior: 'smooth' });
+}
+
+function selectPrompt(el, text) {
+  document.querySelectorAll('.prompt-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  const msg = document.getElementById('support-message');
+  if (msg) msg.value = text;
+}
+
+let activeSupportId = null;
+
+async function submitSupport() {
+  const name = (document.getElementById('support-name').value || '').trim();
+  const email = (document.getElementById('support-email').value || '').trim();
+  const message = (document.getElementById('support-message').value || '').trim();
+  if (!message) { toast('Please enter a message', 'error'); return; }
+  if (!name) { toast('Please enter your name', 'error'); return; }
+
+  const sendBtn = document.querySelector('#support-form-area button');
+  if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = 'SENDING...'; }
+
+  let userId = null;
+  try { userId = (await sb.auth.getUser()).data?.user?.id || null; } catch(e) {}
+
+  const payload = {
+    customer_name: name,
+    customer_email: email || null,
+    message,
+    status: 'open'
+  };
+  if (userId) payload.user_id = userId;
+
+  const { data, error } = await sb.from('support_messages').insert(payload).select().single();
+
+  if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = 'SEND MESSAGE'; }
+
+  if (error) {
+    console.error('Support error:', error);
+    toast('Could not send: ' + (error.message || 'Please try again'), 'error');
+    return;
+  }
+
+  activeSupportId = data.id;
+  localStorage.setItem('lotex_support_id', data.id);
+  localStorage.setItem('lotex_support_msg', message);
+  localStorage.setItem('lotex_support_time', data.created_at);
+  // Show thread - pass message text directly (before textarea gets cleared)
+  document.getElementById('support-form-area').style.display = 'none';
+  document.getElementById('support-thread').style.display = 'block';
+  document.getElementById('support-reply-area').style.display = 'block';
+  renderSupportThread([{ sender: 'customer', body: message, created_at: data.created_at }]);
+  toast('Message sent! We\'ll reply soon.', 'success');
+  startReplyPolling(data.id, message, data.created_at);
+}
+
+function renderSupportThread(messages) {
+  const thread = document.getElementById('support-thread');
+  thread.innerHTML = messages.map(m => `
+    <div class="support-bubble ${m.sender === 'admin' ? 'admin' : 'customer'}">
+      <div class="bubble-body">${m.body}</div>
+      <div class="bubble-meta">${m.sender === 'admin' ? 'Lotex Support' : 'You'} &middot; ${new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div>
+    </div>`).join('') + `
+    <div style="text-align:center;margin-top:16px;">
+      <button onclick="startNewSupportChat()" style="background:none;border:1px solid var(--border);border-radius:20px;padding:6px 18px;color:var(--muted);font-family:'Montserrat',sans-serif;font-size:11px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">+ New Conversation</button>
+    </div>`;
+  thread.scrollTop = thread.scrollHeight;
+}
+
+let replyPollInterval = null;
+let lastReplyCount = 0;
+
+function startReplyPolling(msgId, originalMsg, sentAt) {
+  if (replyPollInterval) clearInterval(replyPollInterval);
+  const msg = originalMsg || localStorage.getItem('lotex_support_msg') || '';
+  const time = sentAt || localStorage.getItem('lotex_support_time') || new Date().toISOString();
+  lastReplyCount = 0;
+
+  replyPollInterval = setInterval(async () => {
+    const { data: replies } = await sb.from('support_replies')
+      .select('*').eq('message_id', msgId).order('created_at', { ascending: true });
+    const adminReplies = (replies || []).filter(r => r.sender === 'admin');
+    // Notify customer if new admin reply arrived
+    if (adminReplies.length > lastReplyCount) {
+      if (lastReplyCount > 0) { // don't toast on first load
+        toast('💬 Lotex Support replied!', 'success');
+        // Show dot on Support nav if not currently on support page
+        const supportPage = document.getElementById('page-support');
+        if (!supportPage?.classList.contains('active')) {
+          const dot = document.getElementById('support-notif-dot');
+          if (dot) dot.style.display = 'block';
+        }
+      }
+      lastReplyCount = adminReplies.length;
+    }
+    const allBubbles = [
+      { sender: 'customer', body: msg, created_at: time },
+      ...(replies || [])
+    ];
+    renderSupportThread(allBubbles);
+  }, 4000);
+}
+
+
+async function sendCustomerReply() {
+  const msgId = localStorage.getItem('lotex_support_id');
+  if (!msgId) return;
+  const input = document.getElementById('customer-reply-input');
+  const body = (input?.value || '').trim();
+  if (!body) return;
+  input.disabled = true;
+  const { error } = await sb.from('support_replies').insert({ message_id: msgId, sender: 'customer', body });
+  input.disabled = false;
+  if (error) { toast('Could not send reply', 'error'); return; }
+  input.value = '';
+  const originalMsg = localStorage.getItem('lotex_support_msg') || '';
+  const sentAt = localStorage.getItem('lotex_support_time') || '';
+  restoreSupportThread(msgId, originalMsg, sentAt);
+}
+
+
+// ===== MY ORDERS =====
+async function showMyOrders() {
+  if (!currentUser) { openAuth(); return; }
+  setActivePage('page-orders');
+  const el = document.getElementById('my-orders-list');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
+
+  const { data: orders } = await sb.from('orders')
+    .select('*')
+    .eq('customer_id', currentUser.id)
+    .order('created_at', { ascending: false });
+
+  if (!orders?.length) {
+    el.innerHTML = `
+      <div class="empty-state" style="padding:60px 20px; text-align:center;">
+        <div style="font-size:48px; opacity:0.2; margin-bottom:16px;">📦</div>
+        <div style="font-weight:700; margin-bottom:8px;">No orders yet</div>
+        <div style="font-size:12px; color:var(--muted); margin-bottom:24px;">Your orders will appear here after you shop</div>
+        <button onclick="showShop('shoes')" class="btn-full orange" style="max-width:200px; margin:0 auto; display:block;">SHOP NOW</button>
+      </div>`;
+    return;
+  }
+
+  const steps = ['pending','payment_pending','confirmed','shipped','delivered'];
+  const stepLabels = ['Ordered','Payment','Confirmed','Shipped','Delivered'];
+  const stepIcons = ['', '', '', '', ''];
+  const statusColors = {
+    pending: 'var(--muted)',
+    payment_pending: 'var(--orange)',
+    confirmed: '#3b82f6',
+    shipped: '#8b5cf6',
+    delivered: '#22c55e',
+    cancelled: 'var(--red)'
+  };
+  const statusLabels = {
+    pending: 'Order Placed',
+    payment_pending: 'Awaiting Payment',
+    confirmed: 'Confirmed',
+    shipped: 'Out for Delivery',
+    delivered: 'Delivered',
+    cancelled: 'Cancelled'
+  };
+
+  el.innerHTML = orders.map(order => {
+    const shortId = 'LTX-' + order.id.slice(0,8).toUpperCase();
+    const currentIdx = steps.indexOf(order.status);
+    const color = statusColors[order.status] || 'var(--muted)';
+    const label = statusLabels[order.status] || order.status;
+    const isCancelled = order.status === 'cancelled';
+    const trackSteps = ['pending','confirmed','shipped','delivered'];
+    const trackLabels = ['Ordered','Confirmed','Shipped','Delivered'];
+    const trackIdx = trackSteps.indexOf(order.status);
+
+    return `
+    <div style="background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden; margin-bottom:16px;">
+      <!-- Header -->
+      <div style="padding:16px 20px; background:var(--card2); display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border);">
+        <div>
+          <div style="font-family:'Bebas Neue',cursive; font-size:18px; color:var(--gold); letter-spacing:2px;">${shortId}</div>
+          <div style="font-size:11px; color:var(--muted); margin-top:2px;">${new Date(order.created_at).toLocaleDateString('en-KE', {day:'numeric',month:'short',year:'numeric'})}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-family:'Bebas Neue',cursive; font-size:22px; color:var(--orange);">KES ${order.total_amount?.toLocaleString()}</div>
+          <div style="display:inline-block; background:${color}22; border:1px solid ${color}44; border-radius:20px; padding:3px 10px; font-size:10px; font-weight:700; color:${color}; margin-top:4px; letter-spacing:1px;">${label.toUpperCase()}</div>
+        </div>
+      </div>
+
+      <!-- Progress tracker (not cancelled) -->
+      ${!isCancelled ? `
+      <div style="padding:20px; border-bottom:1px solid var(--border);">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; position:relative;">
+          <div style="position:absolute; top:14px; left:14px; right:14px; height:2px; background:var(--border); z-index:0;"></div>
+          <div style="position:absolute; top:14px; left:14px; height:2px; width:${trackIdx <= 0 ? '0%' : trackIdx === 1 ? '33%' : trackIdx === 2 ? '66%' : '100%'}; background:var(--orange); z-index:1; transition:width 0.5s;"></div>
+          ${trackSteps.map((s, i) => {
+            const done = i < trackIdx;
+            const active = i === trackIdx;
+            return `
+            <div style="display:flex; flex-direction:column; align-items:center; z-index:2; flex:1;">
+              <div style="width:28px; height:28px; border-radius:50%; border:2px solid ${done || active ? 'var(--orange)' : 'var(--border)'}; background:${done ? 'var(--orange)' : active ? 'var(--card)' : 'var(--card)'}; display:flex; align-items:center; justify-content:center; margin-bottom:6px;">
+                ${done ? `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>` : active ? `<div style="width:8px;height:8px;border-radius:50%;background:var(--orange);"></div>` : ''}
+              </div>
+              <div style="font-size:9px; letter-spacing:1px; color:${done || active ? 'var(--text)' : 'var(--muted)'}; font-weight:${active ? '700' : '400'}; text-align:center;">${trackLabels[i]}</div>
+            </div>`;
+          }).join('')}
+        </div>
+        ${order.status === 'payment_pending' ? `
+        <div style="margin-top:14px; background:rgba(255,107,0,0.08); border:1px solid rgba(255,107,0,0.2); border-radius:8px; padding:12px 14px; font-size:12px; color:var(--orange); font-weight:600;">
+          💳 Payment pending — PayBill: <strong>247247</strong> · Account: <strong>1090186472773</strong> · Ref: <strong>${shortId}</strong>
+        </div>` : ''}
+      </div>` : `
+      <div style="padding:16px 20px; border-bottom:1px solid var(--border);">
+        <div style="font-size:12px; color:var(--red);">This order was cancelled.</div>
+      </div>`}
+
+      <!-- Delivery info -->
+      <div style="padding:14px 20px; display:flex; justify-content:space-between; align-items:center;">
+        <div style="font-size:12px; color:var(--muted);">
+          Deliver to <strong style="color:var(--text);">${order.delivery_name}</strong> · ${order.delivery_phone || ''}
+          ${order.notes ? `<div style="margin-top:3px; font-size:11px;">${order.notes}</div>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+
+// ===== M-PESA STK PUSH =====
+const SUPABASE_FUNCTIONS_URL = 'https://myewthmcvhioswmmnbqp.supabase.co/functions/v1';
+
+async function initiateStkPush(orderId, shortId, amount, btn) {
+  const phone = document.getElementById('mpesa-phone')?.value?.trim();
+  if (!phone) { toast('Enter your M-Pesa phone number', 'error'); return; }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Sending request...';
+
+  try {
+    const res = await fetch(`${SUPABASE_FUNCTIONS_URL}/mpesa-stk`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15ZXd0aG1jdmhpb3N3bW1uYnFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMDg4MDksImV4cCI6MjA4Nzg4NDgwOX0.M-Bxdlo6ijSBFIfV3kJg6QBDrIyZMSS0Hp0-f7CweoQ'
+      },
+      body: JSON.stringify({ phone, amount, orderId, shortId })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      // Show waiting screen
+      document.getElementById('cart-body').innerHTML = `
+        <div class="success-box" style="text-align:center; padding:40px 20px;">
+          <div style="font-size:48px; margin-bottom:16px;">📲</div>
+          <div class="success-title" style="margin-bottom:12px;">CHECK YOUR PHONE!</div>
+          <div style="font-size:13px; color:var(--muted); line-height:1.9;">
+            A payment request has been sent to <strong style="color:var(--orange);">${phone}</strong>.<br><br>
+            Enter your <strong>M-Pesa PIN</strong> to complete payment.<br><br>
+            <span style="font-size:11px; color:var(--muted);">Order: <strong style="color:var(--gold);">${shortId}</strong></span>
+          </div>
+          <div style="margin-top:20px; padding:12px 16px; background:rgba(255,107,0,0.08); border-radius:8px; font-size:11px; color:var(--muted);">
+            Didn't get the prompt? Ensure M-Pesa is active on this number and try again.
+          </div>
+          <button class="btn-full orange" onclick="closeCart(); showTrack('${shortId}');" style="margin-top:24px;">TRACK MY ORDER</button>
+        </div>`;
+    } else {
+      toast('STK push failed: ' + (data.error || 'Please try again'), 'error');
+      btn.disabled = false;
+      btn.textContent = '📲 REQUEST M-PESA PAYMENT';
+    }
+  } catch (err) {
+    console.error('STK error:', err);
+    // Fallback to manual PayBill if function not deployed yet
+    toast('Auto-payment unavailable — use PayBill 247247 manually', 'error');
+    btn.disabled = false;
+    btn.textContent = '📲 REQUEST M-PESA PAYMENT';
+  }
+}
+
+</script>
+</body>
+</html>
