@@ -1135,19 +1135,25 @@ async function doLogin() {
 }
 
 async function loadAffiliate() {
-  // Get affiliate record
-  const { data: aff } = await sb.from('affiliates')
-    .select('*, profiles(full_name, email, phone)')
+  // Get affiliate record - no join to avoid 406
+  const { data: aff, error: affErr } = await sb.from('affiliates')
+    .select('*')
     .eq('user_id', currentUser.id)
     .single();
 
   if (!aff) {
-    // Not an affiliate at all
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('pending-screen').style.display = 'flex';
     return;
   }
 
+  // Get profile separately
+  const { data: profile } = await sb.from('profiles')
+    .select('full_name, email, phone')
+    .eq('id', currentUser.id)
+    .single();
+
+  aff.profiles = profile || {};
   affiliateData = aff;
 
   if (aff.status === 'pending') {
