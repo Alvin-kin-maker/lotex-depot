@@ -2070,6 +2070,7 @@ function updateAuthUI(profile) {
   // Show My Orders in hamburger menu
   const menuOrders = document.getElementById('menu-my-orders');
   if (menuOrders) menuOrders.style.display = 'block';
+  if (document.getElementById('page-orders')?.classList.contains('active')) loadMyOrders();
   const area = document.getElementById('auth-area');
   const name = profile?.full_name || currentUser?.email?.split('@')[0] || 'Account';
   const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
@@ -2178,26 +2179,58 @@ function showApply() {
 }
 
 function showMyOrders() {
-  if (!currentUser) { openAuth(); return; }
-  setActivePage('page-track');
+  setActivePage('page-orders');
   loadMyOrders();
 }
 
 async function loadMyOrders() {
-  const resultEl = document.getElementById('track-result');
-  resultEl.innerHTML = `<div class="loading"><div class="spinner"></div>Loading your orders...</div>`;
+  const listEl = document.getElementById('my-orders-list');
+  if (!listEl) return;
+
+  if (!currentUser) {
+    listEl.innerHTML = `
+      <div style="text-align:center;padding:48px 20px;">
+        <div style="font-size:40px;margin-bottom:16px;">🔒</div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:24px;color:var(--gold);margin-bottom:8px;">SIGN IN TO VIEW ORDERS</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:24px;">Log in to see your order history and track deliveries</div>
+        <button onclick="openAuth()" style="background:var(--orange);border:none;border-radius:8px;padding:12px 32px;color:#000;font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:2px;cursor:pointer;">LOG IN</button>
+        <div style="margin-top:16px;font-size:12px;color:var(--muted);">Or <span onclick="showTrack()" style="color:var(--orange);cursor:pointer;font-weight:700;">enter your Order ID</span> to track without logging in</div>
+      </div>`;
+    return;
+  }
+
+  listEl.innerHTML = `<div class="loading"><div class="spinner"></div>Loading your orders...</div>`;
   const { data } = await sb.from('orders').select('*').eq('customer_id', currentUser.id).order('created_at', { ascending: false });
-  if (!data?.length) { resultEl.innerHTML = `<div class="empty-state"><p>No orders yet.</p></div>`; return; }
-  resultEl.innerHTML = data.map(o => {
+
+  if (!data?.length) {
+    listEl.innerHTML = `<div class="empty-state"><div style="font-size:40px;margin-bottom:12px;">📦</div><p>No orders yet — start shopping!</p></div>`;
+    return;
+  }
+
+  const statusColor = s => s === 'delivered' ? 'var(--green)' : s === 'pending' || s === 'payment_pending' ? 'var(--orange)' : 'var(--gold)';
+  const statusLabel = s => ({ payment_pending:'Awaiting Payment', pending:'Order Placed', confirmed:'Confirmed', shipped:'Shipped', delivered:'Delivered' }[s] || s);
+
+  listEl.innerHTML = data.map(o => {
     const shortId = 'LTX-' + o.id.slice(0,8).toUpperCase();
-    const statusColor = o.status === 'delivered' ? 'var(--green)' : o.status === 'payment_pending' || o.status === 'pending' ? 'var(--orange)' : 'var(--gold)';
-    return `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;cursor:pointer;" onclick="document.getElementById('track-input').value='${shortId}';trackOrder();">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div style="font-family:'Bebas Neue',cursive;font-size:18px;color:var(--gold);letter-spacing:1px;">${shortId}</div>
-        <div style="font-size:11px;font-weight:700;color:${statusColor};text-transform:uppercase;">${o.status.replace('_',' ')}</div>
-      </div>
-      <div style="font-size:12px;color:var(--muted);margin-top:4px;">KES ${o.total_amount?.toLocaleString()} · ${new Date(o.created_at).toLocaleDateString()}</div>
-    </div>`;
+    return `
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="font-family:'Bebas Neue',cursive;font-size:20px;color:var(--gold);letter-spacing:1px;">${shortId}</div>
+          <div style="font-size:11px;font-weight:800;color:${statusColor(o.status)};text-transform:uppercase;background:rgba(255,255,255,0.05);padding:4px 10px;border-radius:20px;">${statusLabel(o.status)}</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div>
+            <div style="font-size:13px;color:var(--muted);">📅 ${new Date(o.created_at).toLocaleDateString('en-KE', {day:'numeric',month:'short',year:'numeric'})}</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:2px;">📍 ${o.delivery_address || '—'}</div>
+          </div>
+          <div style="font-family:'Bebas Neue',cursive;font-size:22px;color:var(--gold);">KES ${o.total_amount?.toLocaleString()}</div>
+        </div>
+        ${o.status === 'payment_pending' || o.status === 'pending' ? `
+        <div style="background:rgba(255,107,0,0.08);border:1px solid rgba(255,107,0,0.2);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--orange);margin-bottom:12px;">
+          💳 Pay via M-Pesa PayBill <strong>247247</strong> · Account <strong>1090186472773</strong>
+        </div>` : ''}
+        <button onclick="document.getElementById('track-input').value='${shortId}';showTrack();setTimeout(trackOrder,100);" style="width:100%;background:none;border:1px solid var(--orange);border-radius:8px;padding:10px;color:var(--orange);font-family:'Bebas Neue',cursive;font-size:14px;letter-spacing:2px;cursor:pointer;touch-action:manipulation;">TRACK ORDER →</button>
+      </div>`;
   }).join('');
 }
 
