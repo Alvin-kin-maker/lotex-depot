@@ -2177,7 +2177,8 @@ function discountCondText(cond) {
 // Store product images in JS map to avoid HTML attribute escaping issues
 const productImagesMap = {};
 
-function productCard(p) {
+function productCard(p, prefix) {
+  prefix = prefix || '';
   const effectivePrice = getEffectivePrice(p);
   const hasDiscount = p.discount_percent > 0 && effectivePrice < p.price;
   const outOfStock = p.stock_quantity <= 0;
@@ -2185,11 +2186,11 @@ function productCard(p) {
   const colors = p.colors || [];
   const images = [p.image_url, ...(p.images || [])].filter(Boolean);
   const countdown = hasDiscount ? getDiscountCountdown(p.discount_expires_at) : null;
-  productImagesMap[p.id] = images;
+  productImagesMap[pid] = images;
   if (!window._productData) window._productData = {};
   window._productData[p.id] = p;
 
-  const pid = p.id;
+  const pid = prefix + p.id;
   const pname = p.name.replace(/'/g, "\\'");
   const pimg = (p.image_url || '').replace(/'/g, "\\'");
 
@@ -2243,10 +2244,10 @@ async function loadFeatured() {
       .or('category.eq.shoes,category.eq.accessories,category.is.null')
       .order('created_at', { ascending: false }).limit(4);
     shoesGrid.innerHTML = fallback?.length
-      ? fallback.map(productCard).join('')
+      ? fallback.map(p => productCard(p, 'home-')).join('')
       : `<div class="empty-state"><p>No shoes yet — check back soon!</p></div>`;
   } else {
-    shoesGrid.innerHTML = shoes.map(productCard).join('');
+    shoesGrid.innerHTML = shoes.map(p => productCard(p, 'home-')).join('');
   }
 
   // Load featured clothes
@@ -2258,7 +2259,7 @@ async function loadFeatured() {
 
   if (clothes?.length) {
     clothesSection.style.display = 'block';
-    clothesGrid.innerHTML = clothes.map(productCard).join('');
+    clothesGrid.innerHTML = clothes.map(p => productCard(p, 'home-')).join('');
   } else {
     // Check if any clothes exist at all — show section with latest even if not featured
     const { data: anyClothes } = await sb.from('products').select('*')
@@ -2266,7 +2267,7 @@ async function loadFeatured() {
       .order('created_at', { ascending: false }).limit(4);
     if (anyClothes?.length) {
       clothesSection.style.display = 'block';
-      clothesGrid.innerHTML = anyClothes.map(productCard).join('');
+      clothesGrid.innerHTML = anyClothes.map(p => productCard(p, 'home-')).join('');
     }
   }
 }
@@ -2292,7 +2293,7 @@ async function loadShopCategory(cat) {
     grid.innerHTML = `<div class="empty-state"><p>${emptyMsg}</p></div>`;
     return;
   }
-  grid.innerHTML = data.map(productCard).join('');
+  grid.innerHTML = data.map(p => productCard(p, 'shop-')).join('');
 }
 
 // Legacy - keep for any old references
@@ -3508,7 +3509,7 @@ async function doSearch(val) {
     return;
   }
   sub.textContent = data.length + ' product' + (data.length !== 1 ? 's' : '') + ' found';
-  grid.innerHTML = data.map(productCard).join('');
+  grid.innerHTML = data.map(p => productCard(p, 'search-')).join('');
 }
 
 function clearSearch() {
