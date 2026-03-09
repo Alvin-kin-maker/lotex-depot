@@ -1637,7 +1637,7 @@
     <div class="aff-text">
       <h2>EARN WHILE YOU SELL</h2>
       <p>Join the Lotex Depot affiliate program. Get your unique link, share it anywhere — every sale you drive earns you a commission straight to your pocket.</p>
-      <button class="btn-hero primary" onclick="showApply()">APPLY NOW — IT'S FREE</button>
+      <button class="btn-hero primary" onclick="showApply()" style="position:relative;z-index:2;touch-action:manipulation;">APPLY NOW — IT'S FREE</button>
     </div>
     <div class="aff-numbers">
       <div class="aff-num"><span class="val">1-15%</span><span class="key">Commission</span></div>
@@ -2195,15 +2195,12 @@ async function loadMyOrders() {
 
   if (!currentUser) {
     listEl.innerHTML = `
-      <div style="text-align:center;padding:40px 20px;">
-        <div style="font-size:40px;margin-bottom:12px;">📦</div>
-        <div style="font-family:'Bebas Neue',cursive;font-size:22px;color:var(--gold);margin-bottom:8px;">TRACK YOUR ORDER</div>
-        <div style="font-size:13px;color:var(--muted);margin-bottom:20px;">Enter your Order ID to check status</div>
-        <div style="display:flex;gap:10px;max-width:400px;margin:0 auto;">
-          <input id="my-orders-track-input" placeholder="e.g. LTX-A1B2C3D4" style="flex:1;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;color:var(--text);font-family:'Montserrat',sans-serif;font-size:13px;outline:none;">
-          <button onclick="const v=document.getElementById('my-orders-track-input').value;document.getElementById('track-input').value=v;showTrack();setTimeout(trackOrder,100);" style="background:var(--orange);border:none;border-radius:8px;padding:12px 20px;color:#000;font-family:'Bebas Neue',cursive;font-size:14px;letter-spacing:1px;cursor:pointer;">TRACK</button>
-        </div>
-        <div style="margin-top:20px;font-size:12px;color:var(--muted);">Have an account? <span onclick="openAuth()" style="color:var(--orange);cursor:pointer;font-weight:700;">Log in</span> to see all your orders</div>
+      <div style="text-align:center;padding:48px 20px;">
+        <div style="font-size:48px;margin-bottom:16px;">🔒</div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:24px;color:var(--gold);margin-bottom:8px;">SIGN IN TO VIEW ORDERS</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:24px;">Log in to see your full order history</div>
+        <button onclick="openAuth()" style="background:var(--orange);border:none;border-radius:8px;padding:12px 32px;color:#000;font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:2px;cursor:pointer;touch-action:manipulation;">LOG IN</button>
+        <div style="margin-top:20px;font-size:12px;color:var(--muted);">No account? <span onclick="showTrack()" style="color:var(--orange);cursor:pointer;font-weight:700;">Enter your Order ID</span> to track your order</div>
       </div>`;
     return;
   }
