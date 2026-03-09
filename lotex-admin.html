@@ -940,6 +940,51 @@
     padding: 3px 8px;
     border-radius: 4px;
   }
+
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0 !important; padding: 16px; }
+    .page-header { padding: 16px 0 12px; }
+    .page-title { font-size: 20px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .stat-card { padding: 16px; }
+    .stat-val { font-size: 28px; }
+    table { font-size: 11px; }
+    th, td { padding: 8px 6px; }
+    .top-bar { padding: 0 16px; height: 56px; }
+    /* Mobile bottom nav for admin */
+    .admin-bottom-nav { display: flex !important; }
+  }
+
+  .admin-bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 56px;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    z-index: 999;
+    justify-content: space-around;
+    align-items: center;
+  }
+  .abn-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: 'Montserrat', sans-serif;
+    flex: 1;
+    padding: 6px 0;
+    transition: color 0.2s;
+  }
+  .abn-item:hover, .abn-item.active { color: var(--orange); }
+  .abn-item svg { width: 18px; height: 18px; }
 </style>
 </head>
 <body>
@@ -2815,5 +2860,28 @@ async function loadLeaderboard() {
 }
 
 </script>
+
+<div class="admin-bottom-nav" id="admin-bottom-nav">
+  <div class="abn-item" onclick="showPage('dashboard',this)">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    Dash
+  </div>
+  <div class="abn-item" onclick="showPage('orders',this)">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+    Orders
+  </div>
+  <div class="abn-item" onclick="showPage('products',this)">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+    Products
+  </div>
+  <div class="abn-item" onclick="showPage('support',this)">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    Support
+  </div>
+  <div class="abn-item" onclick="showPage('affiliates',this)">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Affiliates
+  </div>
+</div>
 </body>
 </html>
