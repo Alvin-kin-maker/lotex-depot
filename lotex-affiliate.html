@@ -759,6 +759,49 @@
     padding: 3px 8px;
     border-radius: 4px;
   }
+
+  @media (max-width: 768px) {
+    .sidebar { display: none !important; }
+    .main-content { margin-left: 0 !important; padding: 16px 16px 80px; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .stat-box { padding: 16px; }
+    .stat-val { font-size: 26px; }
+    .link-box { flex-direction: column; gap: 12px; padding: 20px 16px; }
+    .link-url { font-size: 11px; }
+    .copy-btn { width: 100%; }
+    .top-bar { padding: 0 16px; }
+    .aff-bottom-nav { display: flex !important; }
+  }
+
+  .aff-bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 56px;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    z-index: 999;
+    justify-content: space-around;
+    align-items: center;
+  }
+  .affbn-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: 'Montserrat', sans-serif;
+    flex: 1;
+    padding: 6px 0;
+    transition: color 0.2s;
+  }
+  .affbn-item:hover, .affbn-item.active { color: var(--orange); }
+  .affbn-item svg { width: 18px; height: 18px; }
 </style>
 </head>
 <body>
@@ -1650,5 +1693,28 @@ async function loadAffLeaderboard() {
 }
 
 </script>
+
+<div class="aff-bottom-nav">
+  <div class="affbn-item" onclick="showPage('dashboard',this)">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    Dashboard
+  </div>
+  <div class="affbn-item" onclick="showPage('commissions',this)">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    Earnings
+  </div>
+  <div class="affbn-item" onclick="showPage('withdraw',this)">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Withdraw
+  </div>
+  <div class="affbn-item" onclick="showPage('leaderboard',this)">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+    Ranks
+  </div>
+  <div class="affbn-item" onclick="showPage('profile',this)">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Profile
+  </div>
+</div>
 </body>
 </html>
