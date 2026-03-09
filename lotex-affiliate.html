@@ -1223,7 +1223,7 @@ async function loadAffiliate() {
   let affiliateLinkBase;
   if (window.location.protocol === 'file:') {
     // Local testing - show a placeholder so they know it'll work when hosted
-    affiliateLinkBase = 'https://lotex-depot.netlify.app/lotex-website.html';
+    affiliateLinkBase = 'https://lotex-depot.vercel.app/lotex-website.html';
   } else {
     // Hosted - automatically use current domain and path
     const path = window.location.pathname.replace('lotex-affiliate.html', 'lotex-website.html');
