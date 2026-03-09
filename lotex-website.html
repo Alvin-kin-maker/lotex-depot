@@ -34,6 +34,7 @@
     background: var(--black);
     color: var(--text);
     min-height: 100vh;
+    overflow-x: hidden;
   }
 
   /* ===== NAV ===== */
@@ -1543,6 +1544,7 @@
   <a onclick="goHome();closeMobileMenu()">Home</a>
   <a onclick="showShop('shoes');closeMobileMenu()">Shoes</a>
   <a onclick="showShop('clothes');closeMobileMenu()">Clothes</a>
+  <a onclick="showMyOrders();closeMobileMenu()" id="menu-my-orders" style="display:none;">My Orders</a>
   <a onclick="showTrack();closeMobileMenu()">Track Order</a>
   <a onclick="showSupport();closeMobileMenu()">Support</a>
   <a onclick="showApply();closeMobileMenu()">Become Affiliate</a>
@@ -1567,7 +1569,7 @@
     </div>
     <div class="hero-floats">
       <div class="hero-float"><span class="fv" id="hero-prod-count">—</span><span class="fl">Products</span></div>
-      <div class="hero-float"><span class="fv">15%</span><span class="fl">Commission</span></div>
+      <div class="hero-float"><span class="fv">1-15%</span><span class="fl">Commission</span></div>
       <div class="hero-float"><span class="fv">24H</span><span class="fl">Delivery</span></div>
     </div>
   </div>
@@ -2063,6 +2065,9 @@ async function checkSession() {
 }
 
 function updateAuthUI(profile) {
+  // Show My Orders in hamburger menu
+  const menuOrders = document.getElementById('menu-my-orders');
+  if (menuOrders) menuOrders.style.display = 'block';
   const area = document.getElementById('auth-area');
   const name = profile?.full_name || currentUser?.email?.split('@')[0] || 'Account';
   const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
@@ -2167,6 +2172,118 @@ function showSupport() {
 }
 
 function showApply() {
+  setActivePage('page-apply');
+}
+
+function showMyOrders() {
+  if (!currentUser) { openAuth(); return; }
+  setActivePage('page-track');
+  loadMyOrders();
+}
+
+async function loadMyOrders() {
+  const resultEl = document.getElementById('track-result');
+  resultEl.innerHTML = `<div class="loading"><div class="spinner"></div>Loading your orders...</div>`;
+  const { data } = await sb.from('orders').select('*').eq('customer_id', currentUser.id).order('created_at', { ascending: false });
+  if (!data?.length) { resultEl.innerHTML = `<div class="empty-state"><p>No orders yet.</p></div>`; return; }
+  resultEl.innerHTML = data.map(o => {
+    const shortId = 'LTX-' + o.id.slice(0,8).toUpperCase();
+    const statusColor = o.status === 'delivered' ? 'var(--green)' : o.status === 'payment_pending' || o.status === 'pending' ? 'var(--orange)' : 'var(--gold)';
+    return `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;cursor:pointer;" onclick="document.getElementById('track-input').value='${shortId}';trackOrder();">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-family:'Bebas Neue',cursive;font-size:18px;color:var(--gold);letter-spacing:1px;">${shortId}</div>
+        <div style="font-size:11px;font-weight:700;color:${statusColor};text-transform:uppercase;">${o.status.replace('_',' ')}</div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;">KES ${o.total_amount?.toLocaleString()} · ${new Date(o.created_at).toLocaleDateString()}</div>
+    </div>`;
+  }).join('');
+}
+
+async function markOrderPaid(shortId) {
+  const uuid_part = shortId.replace('LTX-', '').toLowerCase();
+  const { data: all } = await sb.from('orders').select('id,status');
+  const order = (all || []).find(o => o.id.startsWith(uuid_part));
+  if (order) {
+    toast('✅ Payment noted! Admin will confirm shortly.', 'success');
+  }
+}
+
+// ===== AUTH =====
+function openAuth() { document.getElementById('auth-overlay').classList.add('show'); }
+function closeAuth() { document.getElementById('auth-overlay').classList.remove('show'); }
+
+function selectRole(role, el) {
+  currentRole = role;
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function toggleAuthMode() {
+  authMode = authMode === 'login' ? 'register' : 'login';
+  const isReg = authMode === 'register';
+  document.getElementById('auth-mode-label').textContent = isReg ? 'Create your account' : 'Sign in to your account';
+  document.getElementById('auth-submit-btn').textContent = isReg ? 'CREATE ACCOUNT' : 'SIGN IN';
+  document.getElementById('auth-switch').innerHTML = isReg
+    ? `Already have an account? <span onclick="toggleAuthMode()">Sign In</span>`
+    : `Don't have an account? <span onclick="toggleAuthMode()">Register</span>`;
+  document.getElementById('register-fields').style.display = isReg ? 'block' : 'none';
+  document.getElementById('auth-err').style.display = 'none';
+}
+
+async function doAuth() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-pass').value;
+  const errEl = document.getElementById('auth-err');
+  const btn = document.getElementById('auth-submit-btn');
+  errEl.style.display = 'none';
+  if (!email || !pass) { errEl.textContent = 'Fill in all fields'; errEl.style.display = 'block'; return; }
+  btn.disabled = true; btn.textContent = 'LOADING...';
+  if (authMode === 'login') {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+    if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'SIGN IN'; return; }
+    currentUser = data.user;
+    const { data: profile } = await sb.from('profiles').select('role, full_name').eq('id', currentUser.id).single();
+    updateAuthUI(profile);
+    closeAuth();
+    toast(`Welcome back, ${profile?.full_name || email.split('@')[0]}!`, 'success');
+  } else {
+    const name = document.getElementById('reg-name').value.trim();
+    const phone = document.getElementById('reg-phone').value.trim();
+    if (!name) { errEl.textContent = 'Enter your full name'; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'CREATE ACCOUNT'; return; }
+    const { data, error } = await sb.auth.signUp({ email, password: pass, options: { data: { full_name: name } } });
+    if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'CREATE ACCOUNT'; return; }
+    await sb.from('profiles').update({ phone, role: currentRole }).eq('id', data.user.id);
+    currentUser = data.user;
+    updateAuthUI({ full_name: name, role: currentRole });
+    closeAuth();
+    toast('✅ Account created! Welcome to Lotex Depot.', 'success');
+  }
+  btn.disabled = false;
+  btn.textContent = authMode === 'login' ? 'SIGN IN' : 'CREATE ACCOUNT';
+}
+
+async function submitApplication() {
+  const name = document.getElementById('apply-name').value.trim();
+  const email = document.getElementById('apply-email').value.trim();
+  const phone = document.getElementById('apply-phone').value.trim();
+  const pass = document.getElementById('apply-pass').value;
+  const errEl = document.getElementById('apply-err');
+  const btn = document.getElementById('apply-btn');
+  errEl.style.display = 'none';
+  if (!name || !email || !phone || !pass) { errEl.textContent = 'Fill in all required fields'; errEl.style.display = 'block'; return; }
+  btn.disabled = true; btn.textContent = 'SUBMITTING...';
+  const { data, error } = await sb.auth.signUp({ email, password: pass, options: { data: { full_name: name } } });
+  if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'SUBMIT APPLICATION'; return; }
+  await sb.from('profiles').update({ phone, role: 'affiliate' }).eq('id', data.user.id);
+  await sb.from('affiliates').insert({ user_id: data.user.id, affiliate_code: 'PENDING', status: 'pending' });
+  btn.disabled = false; btn.textContent = 'SUBMIT APPLICATION';
+  document.querySelector('#page-apply .section').innerHTML = `
+    <div class="success-box">
+      <div class="success-icon">🎉</div>
+      <div class="success-title">APPLICATION SENT!</div>
+      <div class="success-sub">Your application has been submitted.<br><br>Admin will review within <strong style="color:var(--gold);">24–48 hours</strong>.<br><br>Once approved you'll get your unique affiliate link!</div>
+    </div>`;
+}
   setActivePage('page-apply');
   // If they already applied this session, show status instead of form
   const uid = localStorage.getItem('lotex_aff_uid');
@@ -2503,7 +2620,10 @@ function showSuccessModal(shortId, phone) {
         Amount: as shown at checkout<br><br>
         <span style="font-size:11px;color:var(--muted);">Save your Order ID to track delivery</span>
       </div>
-      <button class="btn-full orange" onclick="closeCart();document.getElementById('track-input').value='${shortId}';showTrack();" style="margin-top:20px;">TRACK MY ORDER</button>
+      <div style="display:flex;gap:10px;margin-top:20px;flex-direction:column;">
+        <button class="btn-full orange" onclick="markOrderPaid('${shortId}');this.disabled=true;this.textContent='✅ PAYMENT NOTED';">I HAVE PAID</button>
+        <button class="btn-full orange" style="background:transparent;border:1px solid var(--border);color:var(--text);" onclick="closeCart();document.getElementById('track-input').value='${shortId}';showTrack();">TRACK MY ORDER →</button>
+      </div>
     </div>`;
   document.getElementById('cart-foot').style.display = 'none';
   document.getElementById('cart-overlay').classList.add('show');
