@@ -2186,11 +2186,10 @@ function productCard(p, prefix) {
   const colors = p.colors || [];
   const images = [p.image_url, ...(p.images || [])].filter(Boolean);
   const countdown = hasDiscount ? getDiscountCountdown(p.discount_expires_at) : null;
+  const pid = prefix + p.id;
   productImagesMap[pid] = images;
   if (!window._productData) window._productData = {};
   window._productData[p.id] = p;
-
-  const pid = prefix + p.id;
   const pname = p.name.replace(/'/g, "\\'");
   const pimg = (p.image_url || '').replace(/'/g, "\\'");
 
