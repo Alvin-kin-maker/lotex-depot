@@ -28,7 +28,6 @@
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  input, textarea, select { user-select: text; }
 
   body {
     font-family: 'Montserrat', sans-serif;
@@ -1374,7 +1373,8 @@
       <div style="display:flex; align-items:center; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:0 12px; transition:border 0.2s; height:36px; width:180px;" id="search-box">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);flex-shrink:0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input id="search-input" placeholder="Search products..." style="background:none; border:none; outline:none; color:var(--text); font-family:'Montserrat',sans-serif; font-size:12px; font-weight:500; margin-left:8px; width:100%;" oninput="handleSearch(this.value)" onkeydown="if(event.key==='Enter')doSearch(this.value)">
-        <button id="search-clear" onclick="clearSearch()" style="display:none; background:none; border:none; color:var(--muted); cursor:pointer; font-size:14px; padding:0 0 0 6px;">✕</button>
+        <button id="search-clear" onclick="clearSearch()" style="display:none; background:none; border:none; color:var(--muted); cursor:pointer; font-size:14px; padding:0 0 0 4px;">✕</button>
+        <button onclick="doSearch(document.getElementById('search-input').value)" style="background:var(--orange); border:none; border-radius:6px; padding:4px 10px; color:#000; font-family:'Bebas Neue',cursive; font-size:13px; letter-spacing:1px; cursor:pointer; margin-left:4px; flex-shrink:0;">GO</button>
       </div>
       <div id="search-dropdown" style="display:none; position:absolute; top:42px; left:0; right:0; background:var(--card); border:1px solid var(--border); border-radius:10px; box-shadow:0 8px 32px rgba(0,0,0,0.4); z-index:1000; max-height:320px; overflow-y:auto;"></div>
     </div>
@@ -2079,7 +2079,7 @@ function productCard(p) {
   return `
     <div class="prod-card">
       <div class="prod-img" id="prodimg-${p.id}" data-current="0">
-        ${images.length ? `<img src="${images[0]}" alt="${p.name}" loading="lazy" id="img-${p.id}" onclick="openLightbox(this.src,'${p.name.replace(/'/g,"\'")}')" style="cursor:zoom-in;">` : `<div style="font-size:48px;opacity:0.15;color:var(--text);">&#128095;</div>`}
+        ${images.length ? `<img src="${images[0]}" alt="${p.name}" loading="lazy" id="img-${p.id}" style="cursor:zoom-in;" onclick="openLightbox(document.getElementById('img-${p.id}').src,'${p.name.replace(/'/g,"\'")}')" >` : `<div style="font-size:48px;opacity:0.15;color:var(--text);">&#128095;</div>`}
         ${hasDiscount ? `<div class="discount-badge">${p.discount_percent}% OFF${countdown ? ' &middot; ' + countdown : ''}</div>` : ''}
         ${galleryControls}
       </div>
