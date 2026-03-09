@@ -1262,7 +1262,8 @@
   .dd-item.danger:hover { background: rgba(204,34,0,0.08); }
 
   @media (max-width: 768px) {
-    #search-wrap { display: none; } /* use bottom nav search on mobile */
+    #search-wrap { display: none; }
+    #mobile-search-btn { display: flex !important; }
     /* ── NAV ── */
     nav { padding: 0 16px; height: 56px; }
     .nav-logo { font-size: 22px; }
@@ -1474,8 +1475,9 @@
   </ul>
   <div class="nav-right">
     <!-- Search -->
+    <!-- Desktop search -->
     <div style="position:relative;" id="search-wrap">
-      <div style="display:flex; align-items:center; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:0 12px; transition:border 0.2s; height:36px; width:180px;" id="search-box">
+      <div style="display:flex; align-items:center; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:0 12px; transition:border 0.2s; height:36px; width:200px;" id="search-box">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);flex-shrink:0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input id="search-input" placeholder="Search products..." style="background:none; border:none; outline:none; color:var(--text); font-family:'Montserrat',sans-serif; font-size:12px; font-weight:500; margin-left:8px; width:100%;" oninput="handleSearch(this.value)" onkeydown="if(event.key==='Enter')doSearch(this.value)">
         <button id="search-clear" onclick="clearSearch()" style="display:none; background:none; border:none; color:var(--muted); cursor:pointer; font-size:14px; padding:0 0 0 4px;">✕</button>
@@ -1483,6 +1485,10 @@
       </div>
       <div id="search-dropdown" style="display:none; position:absolute; top:42px; left:0; right:0; background:var(--card); border:1px solid var(--border); border-radius:10px; box-shadow:0 8px 32px rgba(0,0,0,0.4); z-index:1000; max-height:320px; overflow-y:auto;"></div>
     </div>
+    <!-- Mobile search icon (always visible in nav) -->
+    <button id="mobile-search-btn" onclick="focusSearch()" style="display:none; background:none; border:1px solid var(--border); border-radius:8px; width:36px; height:36px; align-items:center; justify-content:center; cursor:pointer; color:var(--text);">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
     <button class="cart-btn" onclick="openCart()">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>Cart <span class="cart-count" id="cart-count">0</span>
     </button>
@@ -1525,7 +1531,7 @@
 
 
   <!-- JUST DROPPED -->
-  <div class="just-dropped">
+  <div class="just-dropped" style="background:linear-gradient(180deg,rgba(15,52,96,0.08) 0%,transparent 100%);">
     <div class="just-dropped-header">
       <div>
         <div class="jd-badge">
@@ -2189,7 +2195,7 @@ function productCard(p) {
     </div>` : '';
 
   const galleryControls = `
-    <button onclick="event.stopPropagation();openLightbox(document.getElementById('img-${p.id}')?.src||'${(p.image_url||'').replace(/'/g,"\'")}','${p.name.replace(/'/g,"\'")}');" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.55);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:13px;z-index:4;display:flex;align-items:center;justify-content:center;">⤢</button>
+    <button onclick="event.stopPropagation();openLightbox(document.getElementById('img-${p.id}')?.src||'${(p.image_url||'').replace(/'/g,"\'")}','${p.name.replace(/'/g,"\'")}');" style="position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,0.6);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:13px;z-index:4;display:flex;align-items:center;justify-content:center;">⤢</button>
     ` + (images.length > 1 ? `
     <button onclick="switchImg(event,'${p.id}','prev')" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.55);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:18px;z-index:3;display:flex;align-items:center;justify-content:center;line-height:1;">&#8249;</button>
     <button onclick="switchImg(event,'${p.id}','next')" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.55);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:18px;z-index:3;display:flex;align-items:center;justify-content:center;line-height:1;">&#8250;</button>
@@ -3376,15 +3382,15 @@ async function loadJustDropped() {
 
   // First card is a bold intro card like Zappos
   const introCard = `
-    <div class="jd-card jd-intro-card" onclick="showShop()" style="background:linear-gradient(135deg,#ff6b00 0%,#cc5500 100%);border-color:var(--orange);min-width:170px;">
+    <div class="jd-card jd-intro-card" onclick="showShop()" style="background:linear-gradient(160deg,#1a1a2e 0%,#16213e 60%,#0f3460 100%);border-color:#0f3460;min-width:170px;">
       <div style="padding:24px 16px;height:100%;display:flex;flex-direction:column;justify-content:space-between;min-height:240px;">
         <div>
-          <div style="font-size:9px;letter-spacing:3px;color:rgba(0,0,0,0.6);font-weight:700;margin-bottom:8px;">JUST DROPPED</div>
-          <div style="font-family:'Bebas Neue',cursive;font-size:36px;color:#000;line-height:1;letter-spacing:2px;">NEW<br>DROPS</div>
+          <div style="font-size:9px;letter-spacing:3px;color:var(--gold);font-weight:700;margin-bottom:10px;opacity:0.9;">✦ JUST DROPPED</div>
+          <div style="font-family:'Bebas Neue',cursive;font-size:38px;color:#fff;line-height:1;letter-spacing:2px;">NEW<br>DROPS</div>
         </div>
         <div>
-          <div style="font-size:11px;color:rgba(0,0,0,0.7);margin-bottom:14px;font-weight:600;line-height:1.4;">Fresh styles added to the store</div>
-          <div style="background:#000;color:var(--orange);font-family:'Bebas Neue',cursive;font-size:13px;letter-spacing:2px;padding:8px 14px;border-radius:6px;display:inline-block;">SHOP NOW →</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.55);margin-bottom:16px;font-weight:500;line-height:1.5;">Fresh styles just added to the store</div>
+          <div style="background:var(--orange);color:#000;font-family:'Bebas Neue',cursive;font-size:13px;letter-spacing:2px;padding:8px 16px;border-radius:6px;display:inline-block;">SHOP NOW →</div>
         </div>
       </div>
     </div>`;
