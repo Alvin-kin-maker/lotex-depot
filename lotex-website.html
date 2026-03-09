@@ -2426,11 +2426,7 @@ function showSuccessModal(shortId, fullId, total) {
         Once we confirm your payment, your order will be processed and shipped. Save your Order ID to track delivery.
       </div>
 
-      <div style="margin-bottom:16px;">
-        <label style="font-size:10px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; display:block; margin-bottom:8px;">Your M-Pesa Phone Number</label>
-        <input id="mpesa-phone" type="tel" placeholder="e.g. 0712345678" style="width:100%; background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; color:var(--text); font-family:'Montserrat',sans-serif; font-size:14px; outline:none; box-sizing:border-box;" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border)'">
-      </div>
-      <button class="btn-full orange" id="stk-btn" onclick="initiateStkPush('${fullId}', '${shortId}', ${total}, this)" style="margin-bottom:10px;">📲 REQUEST M-PESA PAYMENT</button>
+      <button class="btn-full orange" onclick="markPaymentSent('${fullId}', this)" style="margin-bottom:10px;">✓ I'VE SENT THE PAYMENT</button>
       <button class="btn-full" onclick="closeCart();" style="background:var(--card2); border:1px solid var(--border); color:var(--muted);">PAY LATER</button>
     </div>`;
   document.getElementById('cart-foot').style.display = 'none';
