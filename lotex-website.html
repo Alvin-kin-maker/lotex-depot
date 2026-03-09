@@ -1632,7 +1632,7 @@
       <button class="btn-hero primary" onclick="showApply()">APPLY NOW — IT'S FREE</button>
     </div>
     <div class="aff-numbers">
-      <div class="aff-num"><span class="val">15%</span><span class="key">Commission</span></div>
+      <div class="aff-num"><span class="val">1-15%</span><span class="key">Commission</span></div>
       <div class="aff-num"><span class="val">48H</span><span class="key">Payout</span></div>
     </div>
   </div>
@@ -2283,13 +2283,6 @@ async function submitApplication() {
       <div class="success-title">APPLICATION SENT!</div>
       <div class="success-sub">Your application has been submitted.<br><br>Admin will review within <strong style="color:var(--gold);">24–48 hours</strong>.<br><br>Once approved you'll get your unique affiliate link!</div>
     </div>`;
-}
-  setActivePage('page-apply');
-  // If they already applied this session, show status instead of form
-  const uid = localStorage.getItem('lotex_aff_uid');
-  if (uid) {
-    showAffiliateStatus(uid);
-  }
 }
 
 // ===== PRODUCTS =====
