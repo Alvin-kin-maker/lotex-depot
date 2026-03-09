@@ -1484,7 +1484,7 @@
         <button id="search-clear" onclick="clearSearch()" style="display:none; background:none; border:none; color:var(--muted); cursor:pointer; font-size:14px; padding:0 0 0 4px;">✕</button>
         <button onclick="doSearch(document.getElementById('search-input').value)" style="background:var(--orange); border:none; border-radius:6px; padding:5px 12px; color:#000; font-family:'Bebas Neue',cursive; font-size:13px; letter-spacing:1px; cursor:pointer; margin-left:6px; flex-shrink:0; white-space:nowrap;">GO</button>
       </div>
-      <div id="search-dropdown" style="display:none; position:absolute; top:42px; left:0; right:0; background:var(--card); border:1px solid var(--border); border-radius:10px; box-shadow:0 8px 32px rgba(0,0,0,0.4); z-index:1000; max-height:320px; overflow-y:auto;"></div>
+      <div id="search-dropdown" style="display:none; position:absolute; top:42px; left:0; right:0; background:#1a1a1a; border:1px solid var(--border); border-radius:10px; box-shadow:0 8px 32px rgba(0,0,0,0.8); z-index:1000; max-height:320px; overflow-y:auto;"></div>
     </div>
     <!-- Mobile search icon (always visible in nav) -->
     <button id="mobile-search-btn" onclick="focusSearch()" style="display:none; background:none; border:1px solid var(--border); border-radius:8px; width:36px; height:36px; align-items:center; justify-content:center; cursor:pointer; color:var(--text);">
@@ -2183,7 +2183,7 @@ function productCard(p) {
   const hasPicker = sizes.length || colors.length;
   const pickerHtml = hasPicker ? `
     <div style="border-top:1px solid var(--border);margin-top:10px;">
-      <button onclick="togglePicker('${p.id}')" style="width:100%;background:none;border:none;padding:10px 0;cursor:pointer;display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;touch-action:manipulation;">
+      <button onclick="togglePicker('${p.id}')" ontouchstart="event.stopPropagation();event.preventDefault();togglePicker('${p.id}')" style="width:100%;background:none;border:none;padding:12px 0;cursor:pointer;display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;touch-action:manipulation;min-height:44px;">
         <span>Select Options</span>
         <svg id="picker-arrow-${p.id}" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
@@ -2202,10 +2202,10 @@ function productCard(p) {
     </div>` : '';
 
   const galleryControls = `
-    <button onclick="event.stopPropagation();openLightbox(document.getElementById('img-${p.id}')?.src||'${(p.image_url||'').replace(/'/g,"\'")}','${p.name.replace(/'/g,"\'")}');" style="position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,0.65);border:none;color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:16px;z-index:4;display:flex;align-items:center;justify-content:center;touch-action:manipulation;">⤢</button>
+    <button onclick="event.stopPropagation();openLightbox(document.getElementById('img-${p.id}')?.src||'${(p.image_url||'').replace(/'/g,"\'")}','${p.name.replace(/'/g,"\'")}');" style="position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,0.65);border:none;color:#fff;width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:18px;z-index:10;display:flex;align-items:center;justify-content:center;touch-action:manipulation;">⤢</button>
     ` + (images.length > 1 ? `
-    <button onclick="switchImg(event,'${p.id}','prev')" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.55);border:none;color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:20px;z-index:3;display:flex;align-items:center;justify-content:center;line-height:1;touch-action:manipulation;">&#8249;</button>
-    <button onclick="switchImg(event,'${p.id}','next')" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.55);border:none;color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:20px;z-index:3;display:flex;align-items:center;justify-content:center;line-height:1;touch-action:manipulation;">&#8250;</button>
+    <button onclick="switchImg(event,'${p.id}','prev')" ontouchstart="event.stopPropagation();event.preventDefault();switchImg(event,'${p.id}','prev')" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.55);border:none;color:#fff;width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:22px;z-index:10;display:flex;align-items:center;justify-content:center;line-height:1;touch-action:manipulation;">&#8249;</button>
+    <button onclick="switchImg(event,'${p.id}','next')" ontouchstart="event.stopPropagation();event.preventDefault();switchImg(event,'${p.id}','next')" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.55);border:none;color:#fff;width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:22px;z-index:10;display:flex;align-items:center;justify-content:center;line-height:1;touch-action:manipulation;">&#8250;</button>
     <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:3;">
       ${images.map((_, i) => `<span id="dot-${p.id}-${i}" onclick="switchImg(event,'${p.id}',${i})" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${i===0?'var(--gold)':'rgba(255,255,255,0.35)'};cursor:pointer;transition:all 0.2s;"></span>`).join('')}
     </div>` : '');
