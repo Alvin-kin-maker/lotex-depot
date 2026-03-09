@@ -27,7 +27,8 @@
     --glow-gold: 0 0 24px rgba(255,215,0,0.2);
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  input, textarea, select { user-select: text; }
 
   body {
     font-family: 'Montserrat', sans-serif;
@@ -1262,6 +1263,7 @@
   .dd-item.danger:hover { background: rgba(204,34,0,0.08); }
 
   @media (max-width: 768px) {
+    #search-wrap { display: none; } /* hidden on mobile - use bottom nav search */
     /* ── NAV ── */
     nav { padding: 0 16px; height: 56px; }
     .nav-logo { font-size: 22px; }
@@ -1287,13 +1289,15 @@
     .section-head { margin-bottom: 16px; }
 
     /* ── PRODUCT GRID ── */
-    .prod-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .prod-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .prod-card { border-radius: 10px; }
-    .prod-img { height: 160px; }
-    .prod-body { padding: 10px 10px 12px; }
-    .prod-name { font-size: 12px; margin-bottom: 4px; }
-    .prod-price { font-size: 16px; }
-    .add-cart-btn { font-size: 11px; padding: 9px; letter-spacing: 1px; }
+    .prod-img { height: 150px; }
+    .prod-body { padding: 8px 10px 10px; }
+    .prod-name { font-size: 11px; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .prod-price { font-size: 15px; }
+    .prod-orig { font-size: 10px; }
+    .add-cart-btn { font-size: 10px; padding: 8px; letter-spacing: 1px; }
+    .prod-card .size-chip { font-size: 9px; padding: 3px 6px; }
 
     /* ── SHOP TABS ── */
     .shop-tabs { gap: 8px; padding: 12px 16px; overflow-x: auto; }
@@ -1365,6 +1369,15 @@
     <li><a onclick="showApply()">Become Affiliate</a></li>
   </ul>
   <div class="nav-right">
+    <!-- Search -->
+    <div style="position:relative;" id="search-wrap">
+      <div style="display:flex; align-items:center; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:0 12px; transition:border 0.2s; height:36px; width:180px;" id="search-box">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);flex-shrink:0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="search-input" placeholder="Search products..." style="background:none; border:none; outline:none; color:var(--text); font-family:'Montserrat',sans-serif; font-size:12px; font-weight:500; margin-left:8px; width:100%;" oninput="handleSearch(this.value)" onkeydown="if(event.key==='Enter')doSearch(this.value)">
+        <button id="search-clear" onclick="clearSearch()" style="display:none; background:none; border:none; color:var(--muted); cursor:pointer; font-size:14px; padding:0 0 0 6px;">✕</button>
+      </div>
+      <div id="search-dropdown" style="display:none; position:absolute; top:42px; left:0; right:0; background:var(--card); border:1px solid var(--border); border-radius:10px; box-shadow:0 8px 32px rgba(0,0,0,0.4); z-index:1000; max-height:320px; overflow-y:auto;"></div>
+    </div>
     <button class="cart-btn" onclick="openCart()">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>Cart <span class="cart-count" id="cart-count">0</span>
     </button>
@@ -1581,6 +1594,18 @@
 
 <!-- ===== APPLY PAGE ===== -->
 
+
+
+<div class="page" id="page-search">
+  <div class="section" style="max-width:900px; margin:0 auto;">
+    <div style="margin-bottom:24px;">
+      <div id="search-page-title" class="section-title">SEARCH RESULTS</div>
+      <div id="search-page-sub" style="font-size:12px; color:var(--muted); margin-top:4px;"></div>
+    </div>
+    <div class="prod-grid" id="search-results-grid">
+    </div>
+  </div>
+</div>
 
 <div class="page" id="page-track">
   <div class="section" style="max-width:600px; margin:0 auto;">
@@ -2024,9 +2049,9 @@ function productCard(p) {
     <div style="border-top:1px solid var(--border);margin-top:10px;">
       <button onclick="togglePicker('${p.id}')" style="width:100%;background:none;border:none;padding:8px 0;cursor:pointer;display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
         <span>Select Options</span>
-        <svg id="picker-arrow-${p.id}" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.2s;transform:${p.category === 'clothes' ? 'rotate(180deg)' : 'rotate(0deg)'}"><polyline points="6 9 12 15 18 9"/></svg>
+        <svg id="picker-arrow-${p.id}" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-      <div id="picker-${p.id}" style="display:${p.category === 'clothes' ? 'block' : 'none'};padding-bottom:8px;">
+      <div id="picker-${p.id}" style="display:none;padding-bottom:8px;">
         ${sizes.length ? `
           <div style="font-size:10px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Size</div>
           <div class="size-grid" id="sizes-${p.id}">
@@ -2054,7 +2079,7 @@ function productCard(p) {
   return `
     <div class="prod-card">
       <div class="prod-img" id="prodimg-${p.id}" data-current="0">
-        ${images.length ? `<img src="${images[0]}" alt="${p.name}" loading="lazy" id="img-${p.id}">` : `<div style="font-size:48px;opacity:0.15;color:var(--text);">&#128095;</div>`}
+        ${images.length ? `<img src="${images[0]}" alt="${p.name}" loading="lazy" id="img-${p.id}" onclick="openLightbox(this.src,'${p.name.replace(/'/g,"\'")}')" style="cursor:zoom-in;">` : `<div style="font-size:48px;opacity:0.15;color:var(--text);">&#128095;</div>`}
         ${hasDiscount ? `<div class="discount-badge">${p.discount_percent}% OFF${countdown ? ' &middot; ' + countdown : ''}</div>` : ''}
         ${galleryControls}
       </div>
@@ -3188,6 +3213,104 @@ async function initiateStkPush(orderId, shortId, amount, btn) {
   }
 }
 
+
+// ===== LIGHTBOX =====
+function openLightbox(src, name) {
+  const overlay = document.getElementById('lightbox-overlay');
+  const img = document.getElementById('lightbox-img');
+  const nameEl = document.getElementById('lightbox-name');
+  img.src = src;
+  nameEl.textContent = name || '';
+  overlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox-overlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+// Close on escape key
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+// ===== SEARCH =====
+let searchTimer = null;
+
+function handleSearch(val) {
+  const clearBtn = document.getElementById('search-clear');
+  const dropdown = document.getElementById('search-dropdown');
+  if (clearBtn) clearBtn.style.display = val ? 'block' : 'none';
+  clearTimeout(searchTimer);
+  if (!val.trim()) { dropdown.style.display = 'none'; return; }
+  searchTimer = setTimeout(() => liveSearch(val), 300);
+}
+
+async function liveSearch(val) {
+  const dropdown = document.getElementById('search-dropdown');
+  dropdown.style.display = 'block';
+  dropdown.innerHTML = '<div style="padding:12px 16px; font-size:12px; color:var(--muted);">Searching...</div>';
+  const { data } = await sb.from('products')
+    .select('id, name, price, image_url, category')
+    .eq('is_active', true)
+    .ilike('name', `%${val}%`)
+    .limit(6);
+  if (!data?.length) {
+    dropdown.innerHTML = '<div style="padding:14px 16px; font-size:12px; color:var(--muted);">No products found</div>';
+    return;
+  }
+  dropdown.innerHTML = data.map(p => `
+    <div onclick="doSearch('${val.replace(/'/g,"\\'")}');clearSearch();" style="display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.2s;" onmouseover="this.style.background='rgba(255,107,0,0.06)'" onmouseout="this.style.background='transparent'">
+      <div style="width:40px;height:40px;border-radius:6px;overflow:hidden;flex-shrink:0;background:var(--card2);">
+        ${p.image_url ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover;">` : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:18px;">👟</div>'}
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
+        <div style="font-size:11px;color:var(--orange);font-family:'Bebas Neue',cursive;letter-spacing:1px;">KES ${p.price?.toLocaleString()}</div>
+      </div>
+    </div>`).join('') + `
+    <div onclick="doSearch('${val.replace(/'/g,"\\'")}');" style="padding:10px 14px;text-align:center;font-size:11px;color:var(--orange);font-weight:700;cursor:pointer;letter-spacing:1px;" onmouseover="this.style.background='rgba(255,107,0,0.06)'" onmouseout="this.style.background='transparent'">
+      SEE ALL RESULTS →
+    </div>`;
+}
+
+async function doSearch(val) {
+  if (!val?.trim()) return;
+  const dd = document.getElementById('search-dropdown');
+  if (dd) dd.style.display = 'none';
+  setActivePage('page-search');
+  const grid = document.getElementById('search-results-grid');
+  const title = document.getElementById('search-page-title');
+  const sub = document.getElementById('search-page-sub');
+  title.textContent = `RESULTS FOR "${val.toUpperCase()}"`;
+  grid.innerHTML = '<div class="loading"><div class="spinner"></div>Searching...</div>';
+  const { data } = await sb.from('products')
+    .select('*')
+    .eq('is_active', true)
+    .ilike('name', `%${val}%`)
+    .order('created_at', { ascending: false });
+  if (!data?.length) {
+    sub.textContent = '';
+    grid.innerHTML = `<div class="empty-state" style="padding:60px 20px;text-align:center;"><div style="font-size:48px;opacity:0.2;margin-bottom:16px;">🔍</div><p>No results for "${val}"</p></div>`;
+    return;
+  }
+  sub.textContent = data.length + ' product' + (data.length !== 1 ? 's' : '') + ' found';
+  grid.innerHTML = data.map(productCard).join('');
+}
+
+function clearSearch() {
+  const input = document.getElementById('search-input');
+  const clearBtn = document.getElementById('search-clear');
+  const dd = document.getElementById('search-dropdown');
+  if (input) input.value = '';
+  if (clearBtn) clearBtn.style.display = 'none';
+  if (dd) dd.style.display = 'none';
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#search-wrap')) {
+    const dd = document.getElementById('search-dropdown');
+    if (dd) dd.style.display = 'none';
+  }
+});
+
 </script>
 
 <!-- BOTTOM NAV (mobile only) -->
@@ -3205,13 +3328,36 @@ async function initiateStkPush(orderId, shortId, amount, btn) {
     <span id="bn-cart-count" style="display:none;position:absolute;top:4px;right:16px;background:var(--orange);color:#000;border-radius:50%;width:16px;height:16px;font-size:9px;display:flex;align-items:center;justify-content:center;font-weight:800;">0</span>
     Cart
   </div>
-  <div class="bn-item" id="bn-track" onclick="showTrack(); setBottomNav('bn-track')">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-    Track
+  <div class="bn-item" id="bn-search" onclick="focusSearch(); setBottomNav('bn-search')">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    Search
   </div>
   <div class="bn-item" id="bn-account" onclick="toggleUserMenuOrAuth(); setBottomNav('bn-account')">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     Account
+  </div>
+</div>
+
+
+<!-- MOBILE SEARCH OVERLAY -->
+<div id="mobile-search-overlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:var(--bg); z-index:1001; flex-direction:column; padding:16px;">
+  <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+    <div style="display:flex; align-items:center; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:0 14px; flex:1; height:44px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);flex-shrink:0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="mobile-search-input" placeholder="Search shoes, clothes..." style="background:none;border:none;outline:none;color:var(--text);font-family:'Montserrat',sans-serif;font-size:14px;font-weight:500;margin-left:10px;width:100%;" oninput="handleMobileSearch(this.value)" onkeydown="if(event.key==='Enter'){doSearch(this.value);closeMobileSearch();}">
+    </div>
+    <button onclick="closeMobileSearch()" style="background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;padding:8px 14px;cursor:pointer;white-space:nowrap;">CANCEL</button>
+  </div>
+  <div id="mobile-search-results" style="flex:1;overflow-y:auto;"></div>
+</div>
+
+
+<!-- IMAGE LIGHTBOX -->
+<div id="lightbox-overlay" onclick="closeLightbox()" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.92); z-index:2000; align-items:center; justify-content:center; cursor:zoom-out;">
+  <div style="position:relative; max-width:90vw; max-height:90vh;">
+    <img id="lightbox-img" src="" style="max-width:90vw; max-height:88vh; object-fit:contain; border-radius:8px; display:block;">
+    <button onclick="closeLightbox()" style="position:absolute; top:-16px; right:-16px; background:var(--orange); border:none; border-radius:50%; width:32px; height:32px; color:#000; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-weight:700; line-height:1;">✕</button>
+    <div id="lightbox-name" style="text-align:center; color:#fff; font-family:'Bebas Neue',cursive; font-size:18px; letter-spacing:2px; margin-top:12px;"></div>
   </div>
 </div>
 
