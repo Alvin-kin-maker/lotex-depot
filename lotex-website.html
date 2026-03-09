@@ -1352,6 +1352,111 @@
   }
   .bn-item:hover, .bn-item.active { color: var(--orange); }
   .bn-item svg { width: 20px; height: 20px; }
+
+  /* ===== JUST DROPPED ===== */
+  .just-dropped {
+    padding: 40px 0 40px 40px;
+    overflow: hidden;
+  }
+  .just-dropped-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 40px;
+    margin-bottom: 20px;
+  }
+  .jd-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--orange);
+    color: #000;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 13px;
+    letter-spacing: 2px;
+    padding: 5px 14px 5px 10px;
+    border-radius: 4px;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%);
+    margin-bottom: 8px;
+  }
+  .jd-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 32px;
+    letter-spacing: 3px;
+    color: var(--text);
+    line-height: 1;
+  }
+  .jd-scroll-wrap {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .jd-scroll-wrap::-webkit-scrollbar { display: none; }
+  .jd-card {
+    flex-shrink: 0;
+    width: 200px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    scroll-snap-align: start;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .jd-card:hover { transform: translateY(-4px); border-color: var(--orange); }
+  .jd-card-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+  }
+  .jd-card-img-placeholder {
+    width: 100%;
+    height: 180px;
+    background: var(--card2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    opacity: 0.15;
+  }
+  .jd-card-body {
+    padding: 12px 14px;
+  }
+  .jd-card-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 4px;
+  }
+  .jd-card-price {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 18px;
+    color: var(--orange);
+    letter-spacing: 1px;
+  }
+  .jd-card-new {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  @media (max-width: 768px) {
+    .just-dropped { padding: 28px 0 28px 16px; }
+    .just-dropped-header { padding-right: 16px; }
+    .jd-title { font-size: 24px; }
+    .jd-card { width: 155px; }
+    .jd-card-img, .jd-card-img-placeholder { height: 140px; }
+  }
 </style>
 </head>
 <body>
@@ -1374,7 +1479,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);flex-shrink:0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input id="search-input" placeholder="Search products..." style="background:none; border:none; outline:none; color:var(--text); font-family:'Montserrat',sans-serif; font-size:12px; font-weight:500; margin-left:8px; width:100%;" oninput="handleSearch(this.value)" onkeydown="if(event.key==='Enter')doSearch(this.value)">
         <button id="search-clear" onclick="clearSearch()" style="display:none; background:none; border:none; color:var(--muted); cursor:pointer; font-size:14px; padding:0 0 0 4px;">✕</button>
-        <button onclick="doSearch(document.getElementById('search-input').value)" style="background:var(--orange); border:none; border-radius:6px; padding:4px 10px; color:#000; font-family:'Bebas Neue',cursive; font-size:13px; letter-spacing:1px; cursor:pointer; margin-left:4px; flex-shrink:0;">GO</button>
+        <button onclick="doSearch(document.getElementById('search-input').value)" style="background:var(--orange); border:none; border-radius:6px; padding:5px 12px; color:#000; font-family:'Bebas Neue',cursive; font-size:13px; letter-spacing:1px; cursor:pointer; margin-left:6px; flex-shrink:0; white-space:nowrap;">GO</button>
       </div>
       <div id="search-dropdown" style="display:none; position:absolute; top:42px; left:0; right:0; background:var(--card); border:1px solid var(--border); border-radius:10px; box-shadow:0 8px 32px rgba(0,0,0,0.4); z-index:1000; max-height:320px; overflow-y:auto;"></div>
     </div>
@@ -1416,6 +1521,24 @@
     <strong id="ref-name-strip"></strong>
     <span>— any purchase you make earns them a commission</span>
     <a onclick="showApply()">Want to earn too? →</a>
+  </div>
+
+
+  <!-- JUST DROPPED -->
+  <div class="just-dropped">
+    <div class="just-dropped-header">
+      <div>
+        <div class="jd-badge">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg>
+          JUST DROPPED
+        </div>
+        <div class="jd-title">NEW ARRIVALS</div>
+      </div>
+      <button class="btn-hero outline" style="padding:10px 20px; font-size:11px;" onclick="showShop()">VIEW ALL →</button>
+    </div>
+    <div class="jd-scroll-wrap" id="just-dropped-scroll">
+      <div class="loading"><div class="spinner"></div>Loading...</div>
+    </div>
   </div>
 
   <div class="section">
@@ -2838,6 +2961,7 @@ window.addEventListener('load', () => {
   checkSession();
   updateCartCount();
   loadFeatured();
+  loadJustDropped();
 });
 
 // ===== SUPPORT =====
@@ -3230,6 +3354,36 @@ function closeLightbox() {
 }
 // Close on escape key
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+
+// ===== JUST DROPPED =====
+async function loadJustDropped() {
+  const scroll = document.getElementById('just-dropped-scroll');
+  if (!scroll) return;
+
+  const { data } = await sb.from('products')
+    .select('id, name, price, image_url, category, created_at, discount_percent')
+    .eq('is_active', true)
+    .order('created_at', { ascending: false })
+    .limit(12);
+
+  if (!data?.length) {
+    scroll.innerHTML = '<div style="padding:20px; color:var(--muted); font-size:12px;">No products yet</div>';
+    return;
+  }
+
+  scroll.innerHTML = data.map(p => `
+    <div class="jd-card" onclick="openLightbox('${(p.image_url||'').replace(/'/g,"\'")}','${p.name.replace(/'/g,"\'")}')">
+      ${p.image_url
+        ? `<img class="jd-card-img" src="${p.image_url}" alt="${p.name}" loading="lazy">`
+        : `<div class="jd-card-img-placeholder">👟</div>`}
+      <div class="jd-card-body">
+        <div class="jd-card-new">● New</div>
+        <div class="jd-card-name">${p.name}</div>
+        <div class="jd-card-price">KES ${p.price?.toLocaleString()}</div>
+      </div>
+    </div>`).join('');
+}
 
 // ===== SEARCH =====
 let searchTimer = null;
