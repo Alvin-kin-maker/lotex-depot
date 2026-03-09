@@ -2210,7 +2210,7 @@ function productCard(p) {
   return `
     <div class="prod-card">
       <div class="prod-img" id="prodimg-${p.id}" data-current="0">
-        ${images.length ? `<img src="${images[0]}" alt="${p.name}" loading="lazy" id="img-${p.id}" style="cursor:zoom-in;" ondblclick="openLightbox(this.src,'${p.name.replace(/'/g,"\'")}')">` : `<div style="font-size:48px;opacity:0.15;color:var(--text);">&#128095;</div>`}
+        ${images.length ? `<img src="${images[0]}" alt="${p.name}" loading="lazy" id="img-${p.id}" style="pointer-events:none;">` : `<div style="font-size:48px;opacity:0.15;color:var(--text);">&#128095;</div>`}
         ${hasDiscount ? `<div class="discount-badge">${p.discount_percent}% OFF${countdown ? ' &middot; ' + countdown : ''}</div>` : ''}
         ${galleryControls}
       </div>
@@ -2362,6 +2362,15 @@ function selectColor(productId, color, el) {
   const grid = document.getElementById('colors-' + productId);
   if (grid) grid.querySelectorAll('.size-chip').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
+}
+
+
+function focusSearch() {
+  const overlay = document.getElementById('mobile-search-overlay');
+  if (overlay) {
+    overlay.style.display = 'flex';
+    setTimeout(() => document.getElementById('mobile-search-input')?.focus(), 100);
+  }
 }
 
 function togglePicker(productId) {
