@@ -948,7 +948,7 @@
     <div class="login-tag">⚡ Admin Panel — Owner Only</div>
     <div class="field">
       <label>Email</label>
-      <input type="email" id="login-email" placeholder="admin@lotexdepot.com" autocomplete="email">
+      <input type="email" id="login-email" placeholder="Enter admin email" autocomplete="email">
     </div>
     <div class="field">
       <label>Password</label>
@@ -1441,6 +1441,14 @@ async function doLogin() {
   btn.disabled = true;
   btn.textContent = 'SIGNING IN...';
   err.style.display = 'none';
+
+  // Only allow the admin email
+  if (email.toLowerCase() !== 'johngt3672@gmail.com') {
+    showErr('Access denied.');
+    btn.disabled = false;
+    btn.textContent = 'ACCESS PANEL';
+    return;
+  }
 
   const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
 
