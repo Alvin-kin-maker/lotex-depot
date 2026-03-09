@@ -427,6 +427,10 @@
     text-decoration: none;
   }
 
+  /* ===== SEARCH DROPDOWN ===== */
+  #search-dropdown * { background: #1a1a1a !important; }
+  #search-dropdown { background: #1a1a1a !important; }
+
   /* ===== SECTION ===== */
   .section { padding: 56px 40px; }
 
@@ -2179,70 +2183,41 @@ function productCard(p) {
   const images = [p.image_url, ...(p.images || [])].filter(Boolean);
   const countdown = hasDiscount ? getDiscountCountdown(p.discount_expires_at) : null;
   productImagesMap[p.id] = images;
-  // Store product data for commission rate lookup
   if (!window._productData) window._productData = {};
   window._productData[p.id] = p;
 
-  // Collapsible size+color picker - hidden by default, arrow toggles it
-  const hasPicker = sizes.length || colors.length;
-  const pickerHtml = hasPicker ? `
-    <div style="border-top:1px solid var(--border);margin-top:10px;">
-      <button onclick="togglePicker('${p.id}')" style="width:100%;background:none;border:none;padding:10px 0;cursor:pointer;display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;touch-action:manipulation;">
-        <span>Select Options</span>
-        <svg id="picker-arrow-${p.id}" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <div id="picker-${p.id}" style="display:none;padding-bottom:8px;">
-        ${sizes.length ? `
-          <div style="font-size:10px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Size</div>
-          <div class="size-grid" id="sizes-${p.id}">
-            ${sizes.map(s => `<button class="size-chip" onclick="selectSize('${p.id}','${s}',this)">${s}</button>`).join('')}
-          </div>` : ''}
-        ${colors.length ? `
-          <div style="font-size:10px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;margin-top:8px;">Color</div>
-          <div class="size-grid" id="colors-${p.id}">
-            ${colors.map(c => `<button class="size-chip" onclick="selectColor('${p.id}','${c}',this)">${c}</button>`).join('')}
-          </div>` : ''}
-      </div>
-    </div>` : '';
+  const pid = p.id;
+  const pname = p.name.replace(/'/g, "\\'");
+  const pimg = (p.image_url || '').replace(/'/g, "\\'");
 
-  const galleryControls = (images.length > 1 ? `
-    <button onclick="switchImg(event,'${p.id}','prev')" style="position:absolute;left:6px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.55);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:16px;z-index:5;display:flex;align-items:center;justify-content:center;touch-action:manipulation;">&#8249;</button>
-    <button onclick="switchImg(event,'${p.id}','next')" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.55);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:16px;z-index:5;display:flex;align-items:center;justify-content:center;touch-action:manipulation;">&#8250;</button>
-    <div style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);display:flex;gap:4px;z-index:5;">
-      ${images.map((_, i) => `<span id="dot-${p.id}-${i}" onclick="switchImg(event,'${p.id}',${i})" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${i===0?'#fff':'rgba(255,255,255,0.4)'};cursor:pointer;"></span>`).join('')}
-    </div>` : '') + `
-    <button onclick="openLightbox(document.getElementById('img-${p.id}')?.src||'${(p.image_url||'').replace(/'/g,"\'")}','${p.name.replace(/'/g,"\'")}');" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.55);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:12px;z-index:5;display:flex;align-items:center;justify-content:center;touch-action:manipulation;">⤢</button>`
+  // Size picker
+  let pickerHtml = '';
+  if (sizes.length || colors.length) {
+    let sizeHtml = sizes.length ? `<div style="font-size:10px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Size</div><div class="size-grid" id="sizes-${pid}">${sizes.map(s => `<button class="size-chip" onclick="selectSize('${pid}','${s}',this)">${s}</button>`).join('')}</div>` : '';
+    let colorHtml = colors.length ? `<div style="font-size:10px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;margin-top:8px;">Color</div><div class="size-grid" id="colors-${pid}">${colors.map(c => `<button class="size-chip" onclick="selectColor('${pid}','${c}',this)">${c}</button>`).join('')}</div>` : '';
+    pickerHtml = `<div style="border-top:1px solid var(--border);margin-top:10px;"><button onclick="togglePicker('${pid}')" style="width:100%;background:none;border:none;padding:10px 0;cursor:pointer;display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;touch-action:manipulation;"><span>Select Options</span><svg id="picker-arrow-${pid}" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"/></svg></button><div id="picker-${pid}" style="display:none;padding-bottom:8px;">${sizeHtml}${colorHtml}</div></div>`;
+  }
 
-  const categoryLabel = p.category && p.category !== 'shoes'
-    ? `<div style="font-size:9px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;font-weight:700;margin-bottom:4px;">${p.category}</div>`
-    : '';
+  // Gallery nav buttons
+  let navBtns = '';
+  if (images.length > 1) {
+    const dots = images.map((_, i) => `<span id="dot-${pid}-${i}" onclick="switchImg(event,'${pid}',${i})" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${i===0?'#fff':'rgba(255,255,255,0.4)'};cursor:pointer;margin:0 2px;"></span>`).join('');
+    navBtns = `<button onclick="switchImg(event,'${pid}','prev')" style="position:absolute;left:6px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.6);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;z-index:5;display:flex;align-items:center;justify-content:center;touch-action:manipulation;">&#8249;</button><button onclick="switchImg(event,'${pid}','next')" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.6);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;z-index:5;display:flex;align-items:center;justify-content:center;touch-action:manipulation;">&#8250;</button><div style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);display:flex;z-index:5;">${dots}</div>`;
+  }
 
-  return `
-    <div class="prod-card">
-      <div class="prod-img" id="prodimg-${p.id}" data-current="0">
-        ${images.length ? `<img src="${images[0]}" alt="${p.name}" loading="lazy" id="img-${p.id}" style="pointer-events:none;">` : `<div style="font-size:48px;opacity:0.15;color:var(--text);">&#128095;</div>`}
-        ${hasDiscount ? `<div class="discount-badge">${p.discount_percent}% OFF${countdown ? ' &middot; ' + countdown : ''}</div>` : ''}
-        ${galleryControls}
-      </div>
-      <div class="prod-body">
-        ${categoryLabel}
-        <div class="prod-name">${p.name}</div>
-        ${p.description ? `<div style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.5;">${p.description}</div>` : ''}
-        <div class="prod-price-row">
-          <div class="prod-price">KES ${effectivePrice.toLocaleString()}</div>
-          ${hasDiscount ? `<div class="prod-orig">KES ${p.price.toLocaleString()}</div>` : ''}
-        </div>
-        ${hasDiscount ? `<div class="prod-discount-label">${discountCondText(p.discount_condition)}</div>` : ''}
-        ${sizes.length ? `<div style="font-size:10px;color:var(--orange);font-weight:600;margin-bottom:6px;letter-spacing:1px;">${formatSizeRange(sizes)}</div>` : ''}
-        ${colors.length ? `<div style="font-size:10px;color:var(--muted);margin-bottom:8px;">${colors.join(' &middot; ')}</div>` : ''}
-        ${pickerHtml}
-        <button class="add-cart-btn" ${outOfStock ? 'disabled' : ''} onclick="addToCartWithSize('${p.id}','${p.name.replace(/'/g,"\\'")}',${effectivePrice},'${(images[0]||'').replace(/'/g,"\\'")}',${sizes.length > 0})">
-          ${outOfStock ? 'OUT OF STOCK' : '+ ADD TO CART'}
-        </button>
-      </div>
-    </div>`;
+  const zoomBtn = `<button onclick="openLightbox(document.getElementById('img-${pid}')?.src||'${pimg}','${pname}');" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.55);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:12px;z-index:5;display:flex;align-items:center;justify-content:center;touch-action:manipulation;">⤢</button>`;
+
+  const discountBadge = hasDiscount ? `<div class="discount-badge">${p.discount_percent}% OFF${countdown ? ' · ' + countdown : ''}</div>` : '';
+  const categoryLabel = (p.category && p.category !== 'shoes') ? `<div style="font-size:9px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;font-weight:700;margin-bottom:4px;">${p.category}</div>` : '';
+  const sizeRange = sizes.length ? `<div style="font-size:10px;color:var(--orange);font-weight:600;margin-bottom:6px;letter-spacing:1px;">${formatSizeRange(sizes)}</div>` : '';
+  const colorList = colors.length ? `<div style="font-size:10px;color:var(--muted);margin-bottom:8px;">${colors.join(' · ')}</div>` : '';
+  const desc = p.description ? `<div style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.5;">${p.description}</div>` : '';
+  const origPrice = hasDiscount ? `<div class="prod-orig">KES ${p.price.toLocaleString()}</div>` : '';
+  const discLabel = hasDiscount ? `<div class="prod-discount-label">${discountCondText(p.discount_condition)}</div>` : '';
+  const imgEl = images.length ? `<img src="${images[0]}" alt="${p.name}" loading="lazy" id="img-${pid}" style="pointer-events:none;width:100%;height:100%;object-fit:contain;padding:12px;display:block;">` : `<div style="font-size:48px;opacity:0.15;color:var(--text);">&#128095;</div>`;
+
+  return `<div class="prod-card"><div class="prod-img" id="prodimg-${pid}" data-current="0">${imgEl}${discountBadge}${navBtns}${zoomBtn}</div><div class="prod-body">${categoryLabel}<div class="prod-name">${p.name}</div>${desc}<div class="prod-price-row"><div class="prod-price">KES ${effectivePrice.toLocaleString()}</div>${origPrice}</div>${discLabel}${sizeRange}${colorList}${pickerHtml}<button class="add-cart-btn" ${outOfStock ? 'disabled' : ''} onclick="addToCartWithSize('${pid}','${pname}',${effectivePrice},'${pimg}',${sizes.length > 0})">${outOfStock ? 'OUT OF STOCK' : '+ ADD TO CART'}</button></div></div>`;
 }
-
 
 async function loadFeatured() {
   // Count all products for hero stat
