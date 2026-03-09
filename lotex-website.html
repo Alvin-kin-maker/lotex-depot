@@ -1972,8 +1972,12 @@
       <div class="section-label" style="margin-top:8px;">Payment</div>
 
       <div class="mpesa-note">
-        📱 <strong>M-Pesa Payment</strong><br>
-        After placing your order, you'll receive an M-Pesa STK push to the number above. Enter your PIN to complete payment. Your order is confirmed once payment goes through.
+        📱 <strong>Pay via M-Pesa after placing your order:</strong><br><br>
+        Go to M-Pesa → <strong>Lipa na M-Pesa → Pay Bill</strong><br>
+        Business No: <strong style="color:#fff;">247247</strong><br>
+        Account No: <strong style="color:#fff;">1090186472773</strong><br>
+        Amount: your order total<br><br>
+        <span style="color:#fff;">📋 Copy your Order ID after placing — you'll need it to track your delivery.</span>
       </div>
 
       <div id="checkout-err" class="auth-err"></div>
@@ -2155,6 +2159,11 @@ function showTrack(prefillId) {
     document.getElementById('track-input').value = prefillId;
     trackOrder();
   }
+}
+
+function showSupport() {
+  setActivePage('page-support');
+  if (typeof initSupportPage === 'function') initSupportPage();
 }
 
 function showApply() {
@@ -2459,7 +2468,7 @@ async function placeOrder() {
   const { data: order, error } = await sb.from('orders').insert({
     customer_id: currentUser?.id || null,
     affiliate_id: affiliateId || null,
-    status: 'payment_pending',
+    status: 'pending',
     total_amount: total,
     delivery_name: name,
     delivery_phone: phone,
