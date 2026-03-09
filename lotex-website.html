@@ -1262,7 +1262,7 @@
   .dd-item.danger:hover { background: rgba(204,34,0,0.08); }
 
   @media (max-width: 768px) {
-    #search-wrap { display: none; } /* hidden on mobile - use bottom nav search */
+    #search-wrap { display: none; } /* use bottom nav search on mobile */
     /* ── NAV ── */
     nav { padding: 0 16px; height: 56px; }
     .nav-logo { font-size: 22px; }
@@ -2188,12 +2188,14 @@ function productCard(p) {
       </div>
     </div>` : '';
 
-  const galleryControls = images.length > 1 ? `
+  const galleryControls = `
+    <button onclick="event.stopPropagation();openLightbox(document.getElementById('img-${p.id}')?.src||'${(p.image_url||'').replace(/'/g,"\'")}','${p.name.replace(/'/g,"\'")}');" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.55);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:13px;z-index:4;display:flex;align-items:center;justify-content:center;">⤢</button>
+    ` + (images.length > 1 ? `
     <button onclick="switchImg(event,'${p.id}','prev')" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.55);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:18px;z-index:3;display:flex;align-items:center;justify-content:center;line-height:1;">&#8249;</button>
     <button onclick="switchImg(event,'${p.id}','next')" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.55);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:18px;z-index:3;display:flex;align-items:center;justify-content:center;line-height:1;">&#8250;</button>
     <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:3;">
       ${images.map((_, i) => `<span id="dot-${p.id}-${i}" onclick="switchImg(event,'${p.id}',${i})" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${i===0?'var(--gold)':'rgba(255,255,255,0.35)'};cursor:pointer;transition:all 0.2s;"></span>`).join('')}
-    </div>` : '';
+    </div>` : '');
 
   const categoryLabel = p.category && p.category !== 'shoes'
     ? `<div style="font-size:9px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;font-weight:700;margin-bottom:4px;">${p.category}</div>`
@@ -2202,7 +2204,7 @@ function productCard(p) {
   return `
     <div class="prod-card">
       <div class="prod-img" id="prodimg-${p.id}" data-current="0">
-        ${images.length ? `<img src="${images[0]}" alt="${p.name}" loading="lazy" id="img-${p.id}" style="cursor:zoom-in;" onclick="openLightbox(document.getElementById('img-${p.id}').src,'${p.name.replace(/'/g,"\'")}')" >` : `<div style="font-size:48px;opacity:0.15;color:var(--text);">&#128095;</div>`}
+        ${images.length ? `<img src="${images[0]}" alt="${p.name}" loading="lazy" id="img-${p.id}" style="cursor:zoom-in;" ondblclick="openLightbox(this.src,'${p.name.replace(/'/g,"\'")}')">` : `<div style="font-size:48px;opacity:0.15;color:var(--text);">&#128095;</div>`}
         ${hasDiscount ? `<div class="discount-badge">${p.discount_percent}% OFF${countdown ? ' &middot; ' + countdown : ''}</div>` : ''}
         ${galleryControls}
       </div>
@@ -3365,14 +3367,29 @@ async function loadJustDropped() {
     .select('id, name, price, image_url, category, created_at, discount_percent')
     .eq('is_active', true)
     .order('created_at', { ascending: false })
-    .limit(12);
+    .limit(7);
 
   if (!data?.length) {
     scroll.innerHTML = '<div style="padding:20px; color:var(--muted); font-size:12px;">No products yet</div>';
     return;
   }
 
-  scroll.innerHTML = data.map(p => `
+  // First card is a bold intro card like Zappos
+  const introCard = `
+    <div class="jd-card jd-intro-card" onclick="showShop()" style="background:linear-gradient(135deg,#ff6b00 0%,#cc5500 100%);border-color:var(--orange);min-width:170px;">
+      <div style="padding:24px 16px;height:100%;display:flex;flex-direction:column;justify-content:space-between;min-height:240px;">
+        <div>
+          <div style="font-size:9px;letter-spacing:3px;color:rgba(0,0,0,0.6);font-weight:700;margin-bottom:8px;">JUST DROPPED</div>
+          <div style="font-family:'Bebas Neue',cursive;font-size:36px;color:#000;line-height:1;letter-spacing:2px;">NEW<br>DROPS</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:rgba(0,0,0,0.7);margin-bottom:14px;font-weight:600;line-height:1.4;">Fresh styles added to the store</div>
+          <div style="background:#000;color:var(--orange);font-family:'Bebas Neue',cursive;font-size:13px;letter-spacing:2px;padding:8px 14px;border-radius:6px;display:inline-block;">SHOP NOW →</div>
+        </div>
+      </div>
+    </div>`;
+
+  scroll.innerHTML = introCard + data.map(p => `
     <div class="jd-card" onclick="openLightbox('${(p.image_url||'').replace(/'/g,"\'")}','${p.name.replace(/'/g,"\'")}')">
       ${p.image_url
         ? `<img class="jd-card-img" src="${p.image_url}" alt="${p.name}" loading="lazy">`
@@ -3500,6 +3517,7 @@ document.addEventListener('click', e => {
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);flex-shrink:0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input id="mobile-search-input" placeholder="Search shoes, clothes..." style="background:none;border:none;outline:none;color:var(--text);font-family:'Montserrat',sans-serif;font-size:14px;font-weight:500;margin-left:10px;width:100%;" oninput="handleMobileSearch(this.value)" onkeydown="if(event.key==='Enter'){doSearch(this.value);closeMobileSearch();}">
     </div>
+    <button onclick="doSearch(document.getElementById('mobile-search-input').value);closeMobileSearch();" style="background:var(--orange);border:none;border-radius:8px;color:#000;font-family:'Bebas Neue',cursive;font-size:14px;letter-spacing:1px;padding:8px 16px;cursor:pointer;white-space:nowrap;">SEARCH</button>
     <button onclick="closeMobileSearch()" style="background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;padding:8px 14px;cursor:pointer;white-space:nowrap;">CANCEL</button>
   </div>
   <div id="mobile-search-results" style="flex:1;overflow-y:auto;"></div>
