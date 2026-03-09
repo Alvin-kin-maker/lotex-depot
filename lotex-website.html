@@ -1262,16 +1262,93 @@
   .dd-item.danger:hover { background: rgba(204,34,0,0.08); }
 
   @media (max-width: 768px) {
-    nav { padding: 0 20px; }
+    /* ── NAV ── */
+    nav { padding: 0 16px; height: 56px; }
+    .nav-logo { font-size: 22px; }
     .nav-links { display: none; }
-    .hero { padding: 40px 20px; }
-    .hero-title { font-size: 64px; }
+    .cart-btn { font-size: 12px; padding: 7px 12px; }
+    .auth-btn { font-size: 11px; padding: 7px 12px; }
+
+    /* ── BOTTOM NAV ── */
+    .bottom-nav { display: flex; }
+
+    /* ── HERO ── */
+    .hero { padding: 28px 16px 32px; min-height: unset; }
+    .hero-title { font-size: 52px; line-height: 1; }
+    .hero-eyebrow { font-size: 10px; }
+    .hero-desc { font-size: 13px; }
     .hero-floats { display: none; }
-    .section { padding: 40px 20px; }
-    .aff-section { margin: 0 20px 40px; padding: 36px 24px; flex-direction: column; gap: 32px; }
-    .aff-numbers { gap: 24px; }
-    .prod-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+    .hero-btns { flex-direction: column; gap: 10px; }
+    .btn-hero { width: 100%; text-align: center; padding: 14px; font-size: 13px; }
+
+    /* ── SECTIONS ── */
+    .section { padding: 24px 16px; }
+    .section-title { font-size: 18px; }
+    .section-head { margin-bottom: 16px; }
+
+    /* ── PRODUCT GRID ── */
+    .prod-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .prod-card { border-radius: 10px; }
+    .prod-img { height: 160px; }
+    .prod-body { padding: 10px 10px 12px; }
+    .prod-name { font-size: 12px; margin-bottom: 4px; }
+    .prod-price { font-size: 16px; }
+    .add-cart-btn { font-size: 11px; padding: 9px; letter-spacing: 1px; }
+
+    /* ── SHOP TABS ── */
+    .shop-tabs { gap: 8px; padding: 12px 16px; overflow-x: auto; }
+
+    /* ── AFF SECTION ── */
+    .aff-section { margin: 0 16px 32px; padding: 28px 20px; flex-direction: column; gap: 24px; }
+    .aff-numbers { gap: 20px; justify-content: center; }
+    .aff-num .val { font-size: 36px; }
+
+    /* ── FOOTER ── */
+    footer { padding: 32px 16px 80px; }
+
+    /* ── MODALS ── */
+    .modal { width: calc(100vw - 0px); max-width: 100%; border-radius: 20px 20px 0 0; position: fixed; bottom: 0; top: auto; transform: none; max-height: 90vh; overflow-y: auto; }
+    .overlay { align-items: flex-end; }
+
+    /* ── CART ── */
+    #cart-panel { width: 100vw; border-radius: 20px 20px 0 0; top: auto; bottom: 0; height: 85vh; }
+
+    /* ── SUPPORT ── */
+    .section { padding-bottom: 80px; }
   }
+
+  /* ── BOTTOM NAV BAR ── */
+  .bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 60px;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    z-index: 999;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 8px;
+  }
+  .bn-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    color: var(--muted);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: 'Montserrat', sans-serif;
+    flex: 1;
+  }
+  .bn-item:hover, .bn-item.active { color: var(--orange); }
+  .bn-item svg { width: 20px; height: 20px; }
 </style>
 </head>
 <body>
@@ -2083,6 +2160,12 @@ function saveCart() { localStorage.setItem('lotex_cart', JSON.stringify(cart)); 
 function updateCartCount() {
   const total = cart.reduce((s, i) => s + i.qty, 0);
   document.getElementById('cart-count').textContent = total;
+  // Sync bottom nav cart badge
+  const bnCount = document.getElementById('bn-cart-count');
+  if (bnCount) {
+    bnCount.textContent = total;
+    bnCount.style.display = total > 0 ? 'flex' : 'none';
+  }
 }
 
 // Image gallery switcher
@@ -3106,5 +3189,31 @@ async function initiateStkPush(orderId, shortId, amount, btn) {
 }
 
 </script>
+
+<!-- BOTTOM NAV (mobile only) -->
+<div class="bottom-nav" id="bottom-nav">
+  <div class="bn-item active" id="bn-home" onclick="goHome(); setBottomNav('bn-home')">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Home
+  </div>
+  <div class="bn-item" id="bn-shoes" onclick="showShop('shoes'); setBottomNav('bn-shoes')">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l4-4 4 4 4-4 4 4"/><path d="M2 18h20"/></svg>
+    Shop
+  </div>
+  <div class="bn-item" id="bn-cart" onclick="openCart(); setBottomNav('bn-cart')" style="position:relative;">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+    <span id="bn-cart-count" style="display:none;position:absolute;top:4px;right:16px;background:var(--orange);color:#000;border-radius:50%;width:16px;height:16px;font-size:9px;display:flex;align-items:center;justify-content:center;font-weight:800;">0</span>
+    Cart
+  </div>
+  <div class="bn-item" id="bn-track" onclick="showTrack(); setBottomNav('bn-track')">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    Track
+  </div>
+  <div class="bn-item" id="bn-account" onclick="toggleUserMenuOrAuth(); setBottomNav('bn-account')">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Account
+  </div>
+</div>
+
 </body>
 </html>
