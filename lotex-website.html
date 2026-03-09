@@ -2339,6 +2339,209 @@ async function loadShop() { switchShopTab('shoes'); }
 // ===== CART =====
 function saveCart() { localStorage.setItem('lotex_cart', JSON.stringify(cart)); }
 
+function addToCartWithSize(id, name, price, imageUrl, requiresSize) {
+  if (requiresSize && !selectedSizes[id]) {
+    toast('Please select a size first!', 'error');
+    return;
+  }
+  const size = selectedSizes[id] || null;
+  const color = selectedColors[id] || null;
+  const cartKey = [id, size, color].filter(Boolean).join('-');
+  const existing = cart.find(i => i.cartKey === cartKey);
+  if (existing) {
+    existing.qty++;
+  } else {
+    const prodData = window._productData && window._productData[id];
+    const commRate = prodData ? (prodData.commission_rate || 15) : 15;
+    cart.push({ cartKey, id, name, price, imageUrl, size, color, qty: 1, commRate });
+  }
+  saveCart();
+  updateCartCount();
+  toast('✅ ' + name + (size ? ' (Size ' + size + ')' : '') + ' added to cart!', 'success');
+}
+
+function addToCart(id, name, price, imageUrl) {
+  const existing = cart.find(i => i.id === id && !i.size);
+  if (existing) {
+    existing.qty++;
+  } else {
+    cart.push({ cartKey: id, id, name, price, imageUrl, size: null, qty: 1 });
+  }
+  saveCart();
+  updateCartCount();
+  toast('✅ ' + name + ' added to cart!', 'success');
+}
+
+function removeFromCart(cartKey) {
+  cart = cart.filter(i => i.cartKey !== cartKey);
+  saveCart();
+  updateCartCount();
+  renderCart();
+}
+
+function changeQty(cartKey, delta) {
+  const item = cart.find(i => i.cartKey === cartKey);
+  if (!item) return;
+  item.qty = Math.max(1, item.qty + delta);
+  saveCart();
+  updateCartCount();
+  renderCart();
+}
+
+function renderCart() {
+  const body = document.getElementById('cart-body');
+  const foot = document.getElementById('cart-foot');
+  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  document.getElementById('cart-total').textContent = `KES ${total.toLocaleString()}`;
+  if (!cart.length) {
+    body.innerHTML = `<div class="cart-empty"><div class="icon">🛒</div><p>Your cart is empty</p></div>`;
+    foot.style.display = 'none';
+    return;
+  }
+  foot.style.display = 'block';
+  body.innerHTML = cart.map(item => `
+    <div class="cart-item">
+      <div class="ci-img">
+        ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.name}">` : '👟'}
+      </div>
+      <div class="ci-info">
+        <div class="ci-name">${item.name}${item.size ? ` <span style="color:var(--muted);font-size:11px;">(${item.size})</span>` : ''}${item.color ? ` <span style="color:var(--muted);font-size:11px;">${item.color}</span>` : ''}</div>
+        <div class="ci-price">KES ${(item.price * item.qty).toLocaleString()}</div>
+      </div>
+      <div class="ci-qty">
+        <button class="qty-btn" onclick="changeQty('${item.cartKey}',-1)">−</button>
+        <span class="qty-num">${item.qty}</span>
+        <button class="qty-btn" onclick="changeQty('${item.cartKey}',1)">+</button>
+      </div>
+      <button class="ci-remove" onclick="removeFromCart('${item.cartKey}')">✕</button>
+    </div>`).join('');
+}
+
+function openCart() {
+  renderCart();
+  document.getElementById('cart-overlay').classList.add('show');
+}
+
+function closeCart() { document.getElementById('cart-overlay').classList.remove('show'); }
+
+function openCheckout() {
+  if (!cart.length) { toast('Your cart is empty', 'error'); return; }
+  closeCart();
+  if (currentUser) {
+    sb.from('profiles').select('full_name, phone').eq('id', currentUser.id).single().then(({ data }) => {
+      if (data?.full_name) document.getElementById('ch-name').value = data.full_name;
+      if (data?.phone) document.getElementById('ch-phone').value = data.phone;
+    });
+  }
+  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const delivery = 200;
+  document.getElementById('checkout-summary').innerHTML = `
+    <div class="os-title">Order Summary</div>
+    ${cart.map(i => `<div class="os-item"><span>${i.name} × ${i.qty}${i.size ? ` (${i.size})` : ''}</span><span style="color:var(--gold);">KES ${(i.price * i.qty).toLocaleString()}</span></div>`).join('')}
+    <div class="os-item"><span style="color:var(--muted);">Delivery (flat rate)</span><span style="color:var(--muted);">KES ${delivery.toLocaleString()}</span></div>
+    <div class="os-total"><span class="os-total-label">TOTAL</span><span class="os-total-val">KES ${(total + delivery).toLocaleString()}</span></div>`;
+  document.getElementById('checkout-overlay').classList.add('show');
+}
+
+function closeCheckout() { document.getElementById('checkout-overlay').classList.remove('show'); }
+
+async function placeOrder() {
+  const name = document.getElementById('ch-name').value.trim();
+  const phone = document.getElementById('ch-phone').value.trim();
+  const address = document.getElementById('ch-address').value.trim();
+  const errEl = document.getElementById('checkout-err');
+  errEl.style.display = 'none';
+  if (!name || !phone || !address) { errEl.textContent = 'Please fill in all delivery details'; errEl.style.display = 'block'; return; }
+  const btn = document.getElementById('place-order-btn');
+  btn.disabled = true; btn.textContent = 'PLACING ORDER...';
+  const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const total = subtotal + 200;
+  const { data: order, error } = await sb.from('orders').insert({
+    customer_id: currentUser?.id || null,
+    affiliate_id: affiliateId || null,
+    status: 'payment_pending',
+    total_amount: total,
+    delivery_name: name,
+    delivery_phone: phone,
+    delivery_address: address
+  }).select().single();
+  if (error) { errEl.textContent = 'Error: ' + error.message; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'PLACE ORDER & PAY'; return; }
+  const items = cart.map(i => ({ order_id: order.id, product_id: i.id, quantity: i.qty, unit_price: i.price, commission_earned: affiliateId ? Math.round(i.price * i.qty * (i.commRate || 15) / 100) : 0 }));
+  await sb.from('order_items').insert(items);
+  if (affiliateId) {
+    const totalComm = items.reduce((s, i) => s + i.commission_earned, 0);
+    await sb.from('commissions').insert({ affiliate_id: affiliateId, order_id: order.id, amount: totalComm, status: 'pending' });
+    const { data: aff } = await sb.from('affiliates').select('total_earnings').eq('id', affiliateId).single();
+    await sb.from('affiliates').update({ total_earnings: (aff?.total_earnings || 0) + totalComm }).eq('id', affiliateId);
+  }
+  cart = []; saveCart(); updateCartCount();
+  closeCheckout();
+  const shortId = 'LTX-' + order.id.slice(0,8).toUpperCase();
+  showSuccessModal(shortId, phone);
+  btn.disabled = false; btn.textContent = 'PLACE ORDER & PAY';
+}
+
+function showSuccessModal(shortId, phone) {
+  document.getElementById('cart-body').innerHTML = `
+    <div class="success-box">
+      <div class="success-icon">🎉</div>
+      <div class="success-title">ORDER PLACED!</div>
+      <div class="success-sub">
+        Your order <strong style="color:var(--gold);">${shortId}</strong> is confirmed.<br><br>
+        <strong style="color:var(--orange);">Pay via M-Pesa:</strong><br>
+        PayBill: <strong style="color:var(--gold);">247247</strong><br>
+        Account: <strong style="color:var(--gold);">1090186472773</strong><br>
+        Amount: as shown at checkout<br><br>
+        <span style="font-size:11px;color:var(--muted);">Save your Order ID to track delivery</span>
+      </div>
+      <button class="btn-full orange" onclick="closeCart();document.getElementById('track-input').value='${shortId}';showTrack();" style="margin-top:20px;">TRACK MY ORDER</button>
+    </div>`;
+  document.getElementById('cart-foot').style.display = 'none';
+  document.getElementById('cart-overlay').classList.add('show');
+}
+
+async function trackOrder() {
+  const input = document.getElementById('track-input').value.trim();
+  const resultEl = document.getElementById('track-result');
+  if (!input) { toast('Enter an order ID', 'error'); return; }
+  resultEl.innerHTML = `<div class="loading"><div class="spinner"></div>Searching...</div>`;
+  let order = null;
+  if (input.startsWith('LTX-')) {
+    const uuid_part = input.replace('LTX-', '').toLowerCase();
+    const { data: all } = await sb.from('orders').select('*');
+    order = (all || []).find(o => o.id.startsWith(uuid_part));
+  } else {
+    const { data } = await sb.from('orders').select('*').eq('id', input).single();
+    order = data;
+  }
+  if (!order) { resultEl.innerHTML = `<div class="empty-state"><p>Order not found. Check your ID.</p></div>`; return; }
+  renderTrack(order, resultEl);
+}
+
+function renderTrack(order, el) {
+  const steps = ['payment_pending','pending','confirmed','shipped','delivered'];
+  const labels = ['Awaiting Pay','Ordered','Confirmed','Shipped','Delivered'];
+  const icons = ['💳','⏳','✅','🚚','📦'];
+  const currentIdx = Math.max(0, steps.indexOf(order.status));
+  const shortId = 'LTX-' + order.id.slice(0,8).toUpperCase();
+  el.innerHTML = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <div><div style="font-family:'Bebas Neue',cursive;font-size:24px;color:var(--gold);letter-spacing:2px;">${shortId}</div>
+        <div style="font-size:11px;color:var(--muted);">Placed ${new Date(order.created_at).toLocaleDateString()}</div></div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:28px;color:var(--gold);">KES ${order.total_amount?.toLocaleString()}</div>
+      </div>
+      ${order.status === 'payment_pending' ? `<div style="background:rgba(255,107,0,0.1);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:var(--orange);">💳 <strong>Payment pending</strong> — Pay via M-Pesa PayBill <strong>247247</strong>, Account <strong>1090186472773</strong></div>` : ''}
+      <div class="track-steps">
+        ${steps.slice(1).map((s, i) => `<div class="ts ${(i+1) < currentIdx ? 'done' : (i+1) === currentIdx ? 'current' : ''}"><div class="ts-dot">${icons[i+1]}</div><div class="ts-label">${labels[i+1]}</div></div>`).join('')}
+      </div>
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);">
+        Delivery to: <strong style="color:var(--text);">${order.delivery_name}</strong> · ${order.delivery_phone}<br>
+        <span style="margin-top:4px;display:block;">${order.delivery_address}</span>
+      </div>
+    </div>`;
+}
+
 function updateCartCount() {
   const total = cart.reduce((s, i) => s + i.qty, 0);
   document.getElementById('cart-count').textContent = total;
