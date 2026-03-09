@@ -427,6 +427,33 @@
     text-decoration: none;
   }
 
+
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 6px;
+    background: none;
+    border: none;
+  }
+  .hamburger span { display:block; width:22px; height:2px; background:var(--text); border-radius:2px; transition:all 0.3s; }
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    top: 56px; left: 0; right: 0;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    z-index: 998;
+    flex-direction: column;
+    padding: 8px 0 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a { padding:14px 24px; font-size:13px; font-weight:700; color:var(--text); letter-spacing:1px; text-transform:uppercase; cursor:pointer; border-bottom:1px solid var(--border); font-family:'Montserrat',sans-serif; display:block; }
+  .mobile-menu a:last-child { border-bottom:none; }
+  @media (max-width: 768px) { .hamburger { display: flex; } }
+
   /* ===== SEARCH DROPDOWN ===== */
   #search-dropdown {
     background: #1a1a1a !important;
@@ -1485,6 +1512,7 @@
     <li><a onclick="showSupport()" id="nav-support" style="position:relative;">Support<span id="support-notif-dot" style="display:none;position:absolute;top:-2px;right:-8px;width:7px;height:7px;border-radius:50%;background:var(--orange);"></span></a></li>
     <li><a onclick="showApply()">Become Affiliate</a></li>
   </ul>
+  <button class="hamburger" id="hamburger-btn" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
   <div class="nav-right">
     <!-- Search -->
     <!-- Desktop search -->
@@ -1509,6 +1537,16 @@
     </div>
   </div>
 </nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobile-menu">
+  <a onclick="goHome();closeMobileMenu()">Home</a>
+  <a onclick="showShop('shoes');closeMobileMenu()">Shoes</a>
+  <a onclick="showShop('clothes');closeMobileMenu()">Clothes</a>
+  <a onclick="showTrack();closeMobileMenu()">Track Order</a>
+  <a onclick="showSupport();closeMobileMenu()">Support</a>
+  <a onclick="showApply();closeMobileMenu()">Become Affiliate</a>
+</div>
 
 <!-- ===== HOME PAGE ===== -->
 <div class="page active" id="page-home">
@@ -2393,6 +2431,20 @@ async function handleMobileSearch(val) {
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
     </div>`).join('');
 }
+
+
+function toggleMobileMenu() {
+  document.getElementById('mobile-menu').classList.toggle('open');
+}
+function closeMobileMenu() {
+  const m = document.getElementById('mobile-menu');
+  if (m) m.classList.remove('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#hamburger-btn') && !e.target.closest('#mobile-menu')) {
+    closeMobileMenu();
+  }
+});
 
 function focusSearch() {
   const overlay = document.getElementById('mobile-search-overlay');
