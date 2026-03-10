@@ -2365,7 +2365,7 @@ async function updateAffiliateStatus(id, status, userId) {
 async function loadCustomers() {
   const tbody = document.getElementById('customers-tbody');
   const [{ data: customers }, { data: orders }] = await Promise.all([
-    sb.from('profiles').select('*').eq('role','customer').order('created_at', { ascending: false }),
+    sb.from('profiles').select('*').or('role.eq.customer,role.is.null').order('created_at', { ascending: false }),
     sb.from('orders').select('customer_id, total_amount, status, id, created_at, delivery_name, delivery_address, notes').order('created_at', { ascending: false })
   ]);
 
@@ -2387,7 +2387,14 @@ async function loadCustomers() {
     const spend = custOrders.reduce((s,o) => s + (o.total_amount || 0), 0);
     return `
     <tr style="cursor:pointer;" onclick="toggleCustomerOrders('${c.id}')" title="Click to see orders">
-      <td style="font-weight:600;">${c.full_name || '—'}</td>
+      <td style="font-weight:600;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#000;flex-shrink:0;overflow:hidden;">
+            ${c.avatar_url ? `<img src="${c.avatar_url}" style="width:100%;height:100%;object-fit:cover;">` : (c.full_name||'?').split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2)}
+          </div>
+          <span>${c.full_name || '—'}</span>
+        </div>
+      </td>
       <td style="color:var(--muted); font-size:12px;">${c.email || '—'}</td>
       <td style="color:var(--muted);">${c.phone || '—'}</td>
       <td style="color:var(--gold); font-weight:700;">${custOrders.length} order${custOrders.length !== 1 ? 's' : ''}</td>
