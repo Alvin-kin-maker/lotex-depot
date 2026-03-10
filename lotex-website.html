@@ -2924,12 +2924,13 @@ async function uploadAvatar(input) {
   const path = `avatars/${currentUser.id}.${ext}`;
 
   const { error: upErr } = await sb.storage.from('product-images').upload(path, file, { upsert: true });
-  if (upErr) { toast('Upload failed: ' + upErr.message, 'error'); return; }
+  if (upErr) { toast('Upload failed: ' + upErr.message, 'error'); console.error('Upload error:', upErr); return; }
 
   const { data: urlData } = sb.storage.from('product-images').getPublicUrl(path);
   const url = urlData.publicUrl;
 
-  await sb.from('profiles').update({ avatar_url: url }).eq('id', currentUser.id);
+  const { error: profErr } = await sb.from('profiles').update({ avatar_url: url }).eq('id', currentUser.id);
+  if (profErr) { toast('Profile save failed: ' + profErr.message, 'error'); console.error('Profile update error:', profErr); return; }
 
   // Update display
   const avatar = document.getElementById('profile-avatar-display');
@@ -3060,10 +3061,20 @@ async function sendCustomerReply() {
 }
 
 function initSupportPage() {
-  // Check if there's an active ticket saved in session
+  // Check if there's an active ticket saved locally
   const savedTicketId = localStorage.getItem('lotex_support_ticket');
   if (savedTicketId) {
     loadSupportThread(savedTicketId);
+    return;
+  }
+  // If logged in, check for existing open ticket by user ID
+  if (currentUser) {
+    sb.from('support_messages').select('id').eq('customer_email', currentUser.email).eq('status', 'open').order('created_at', { ascending: false }).limit(1).then(({ data }) => {
+      if (data?.length) {
+        localStorage.setItem('lotex_support_ticket', data[0].id);
+        loadSupportThread(data[0].id);
+      }
+    });
     return;
   }
   // Fresh form
