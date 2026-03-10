@@ -2145,7 +2145,7 @@ async function checkSession() {
   const { data } = await sb.auth.getSession();
   if (data.session) {
     currentUser = data.session.user;
-    const { data: profile } = await sb.from('profiles').select('role, full_name').eq('id', currentUser.id).single();
+    const { data: profile } = await sb.from('profiles').select('role, full_name, avatar_url').eq('id', currentUser.id).single();
     updateAuthUI(profile);
   }
 }
@@ -2366,7 +2366,7 @@ async function doAuth() {
     const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
     if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'SIGN IN'; return; }
     currentUser = data.user;
-    const { data: profile } = await sb.from('profiles').select('role, full_name').eq('id', currentUser.id).single();
+    const { data: profile } = await sb.from('profiles').select('role, full_name, avatar_url').eq('id', currentUser.id).single();
     updateAuthUI(profile);
     closeAuth();
     toast(`Welcome back, ${profile?.full_name || email.split('@')[0]}!`, 'success');
@@ -3028,7 +3028,7 @@ async function submitSupport() {
 
   // Store ticket ID for replies and session persistence
   document.getElementById('support-reply-area').dataset.ticketId = data.id;
-  sessionStorage.setItem('lotex_support_ticket', data.id);
+  localStorage.setItem('lotex_support_ticket', data.id);
   toast('Message sent! We\'ll reply soon.', 'success');
 }
 
@@ -3061,7 +3061,7 @@ async function sendCustomerReply() {
 
 function initSupportPage() {
   // Check if there's an active ticket saved in session
-  const savedTicketId = sessionStorage.getItem('lotex_support_ticket');
+  const savedTicketId = localStorage.getItem('lotex_support_ticket');
   if (savedTicketId) {
     loadSupportThread(savedTicketId);
     return;
@@ -3177,7 +3177,7 @@ function updateSupportBadge(count) {
 
 // Check for unread support replies on load
 async function checkSupportNotif() {
-  const ticketId = sessionStorage.getItem('lotex_support_ticket');
+  const ticketId = localStorage.getItem('lotex_support_ticket');
   if (!ticketId) return;
   const { data: replies } = await sb.from('support_replies').select('sender').eq('message_id', ticketId);
   const adminReplies = (replies || []).filter(r => r.sender === 'admin').length;
