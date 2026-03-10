@@ -2776,7 +2776,105 @@ function togglePicker(productId, evt) {
 
 
 
-// ===== HAMBURGER MENU =====
+// ===== SUPPORT =====
+function scrollToChat() {
+  document.getElementById('chat-anchor')?.scrollIntoView({ behavior: 'smooth' });
+}
+
+function selectPrompt(el, text) {
+  // Highlight selected chip
+  document.querySelectorAll('.prompt-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  // Autofill message box
+  const msg = document.getElementById('support-message');
+  if (msg) { msg.value = text; msg.focus(); }
+}
+
+async function submitSupport() {
+  const name = document.getElementById('support-name').value.trim();
+  const email = document.getElementById('support-email').value.trim();
+  const message = document.getElementById('support-message').value.trim();
+
+  if (!name) { toast('Please enter your name', 'error'); return; }
+  if (!message) { toast('Please enter your message', 'error'); return; }
+
+  const btn = document.querySelector('#support-form-area button');
+  btn.disabled = true; btn.textContent = 'SENDING...';
+
+  const { data, error } = await sb.from('support_messages').insert({
+    customer_name: name,
+    customer_email: email || null,
+    customer_id: currentUser?.id || null,
+    message: message,
+    status: 'open'
+  }).select().single();
+
+  btn.disabled = false; btn.textContent = 'SEND MESSAGE';
+
+  if (error) { toast('Error sending message: ' + error.message, 'error'); return; }
+
+  // Show thread view
+  document.getElementById('support-form-area').style.display = 'none';
+  document.getElementById('support-thread').style.display = 'block';
+  document.getElementById('support-reply-area').style.display = 'block';
+  document.getElementById('support-thread').innerHTML = `
+    <div style="margin-bottom:16px;">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">${name} · just now</div>
+      <div style="background:var(--orange);color:#000;border-radius:10px 10px 2px 10px;padding:12px 14px;font-size:13px;max-width:85%;margin-left:auto;">${message}</div>
+    </div>
+    <div style="text-align:center;font-size:11px;color:var(--muted);padding:8px 0;">✅ Message sent — we'll reply shortly</div>`;
+
+  // Store ticket ID for replies
+  document.getElementById('support-reply-area').dataset.ticketId = data.id;
+  toast('Message sent! We\'ll reply soon.', 'success');
+}
+
+async function sendCustomerReply() {
+  const input = document.getElementById('customer-reply-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const ticketId = document.getElementById('support-reply-area').dataset.ticketId;
+  if (!ticketId) return;
+
+  const { error } = await sb.from('support_replies').insert({
+    message_id: ticketId,
+    sender: 'customer',
+    content: text
+  });
+
+  if (error) { toast('Error sending reply', 'error'); return; }
+
+  input.value = '';
+  const thread = document.getElementById('support-thread');
+  const name = document.getElementById('support-name').value || 'You';
+  thread.innerHTML += `
+    <div style="margin-bottom:16px;">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">${name} · just now</div>
+      <div style="background:var(--orange);color:#000;border-radius:10px 10px 2px 10px;padding:12px 14px;font-size:13px;max-width:85%;margin-left:auto;">${text}</div>
+    </div>`;
+  thread.scrollTop = thread.scrollHeight;
+}
+
+function initSupportPage() {
+  // Reset form when navigating to support
+  document.getElementById('support-form-area').style.display = 'block';
+  document.getElementById('support-thread').style.display = 'none';
+  document.getElementById('support-reply-area').style.display = 'none';
+  document.getElementById('support-name').value = '';
+  document.getElementById('support-email').value = '';
+  document.getElementById('support-message').value = '';
+  document.querySelectorAll('.prompt-chip').forEach(c => c.classList.remove('selected'));
+  // Pre-fill name if logged in
+  if (currentUser) {
+    sb.from('profiles').select('full_name, email').eq('id', currentUser.id).single().then(({ data }) => {
+      if (data?.full_name) document.getElementById('support-name').value = data.full_name;
+      if (currentUser.email) document.getElementById('support-email').value = currentUser.email;
+    });
+  }
+}
+
+
 function toggleMobileMenu() {
   const menu = document.getElementById('mobile-menu');
   if (menu) menu.classList.toggle('open');
