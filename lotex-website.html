@@ -2259,6 +2259,7 @@ function showTrack(prefillId) {
 
 function showSupport() {
   setActivePage('page-support');
+  clearInterval(window._supportPollInterval);
   if (typeof initSupportPage === 'function') initSupportPage();
 }
 
@@ -3042,7 +3043,7 @@ async function sendCustomerReply() {
   const { error } = await sb.from('support_replies').insert({
     message_id: ticketId,
     sender: 'customer',
-    content: text
+    body: text
   });
 
   if (error) { toast('Error sending reply', 'error'); return; }
@@ -3104,7 +3105,7 @@ async function loadSupportThread(ticketId) {
     const isAdmin = r.sender === 'admin';
     html += `<div style="margin-bottom:16px;">
       <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">${isAdmin ? '🟢 Lotex Support' : (ticket?.customer_name || 'You')} · ${new Date(r.created_at).toLocaleTimeString()}</div>
-      <div style="background:${isAdmin ? 'var(--card2)' : 'var(--orange)'};color:${isAdmin ? 'var(--text)' : '#000'};border-radius:${isAdmin ? '10px 10px 10px 2px' : '10px 10px 2px 10px'};padding:12px 14px;font-size:13px;max-width:85%;${isAdmin ? '' : 'margin-left:auto;'}">${r.content}</div>
+      <div style="background:${isAdmin ? 'var(--card2)' : 'var(--orange)'};color:${isAdmin ? 'var(--text)' : '#000'};border-radius:${isAdmin ? '10px 10px 10px 2px' : '10px 10px 2px 10px'};padding:12px 14px;font-size:13px;max-width:85%;${isAdmin ? '' : 'margin-left:auto;'}">${r.body || r.content || ""}</div>
     </div>`;
   });
 
@@ -3114,6 +3115,73 @@ async function loadSupportThread(ticketId) {
 
   thread.innerHTML = html;
   thread.scrollTop = thread.scrollHeight;
+
+  // Start polling for new replies every 10 seconds
+  clearInterval(window._supportPollInterval);
+  window._supportPollInterval = setInterval(() => pollSupportReplies(ticketId), 10000);
+}
+
+async function pollSupportReplies(ticketId) {
+  // Only poll if support page is active
+  if (!document.getElementById('page-support')?.classList.contains('active')) {
+    clearInterval(window._supportPollInterval);
+    return;
+  }
+  const { data: replies } = await sb.from('support_replies').select('*').eq('message_id', ticketId).order('created_at', { ascending: true });
+  if (!replies?.length) return;
+
+  const thread = document.getElementById('support-thread');
+  const { data: ticket } = await sb.from('support_messages').select('customer_name').eq('id', ticketId).single();
+
+  let html = '';
+  // Re-render first message
+  const { data: msg } = await sb.from('support_messages').select('*').eq('id', ticketId).single();
+  if (msg) {
+    html += `<div style="margin-bottom:16px;">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">${msg.customer_name} · ${new Date(msg.created_at).toLocaleTimeString()}</div>
+      <div style="background:var(--orange);color:#000;border-radius:10px 10px 2px 10px;padding:12px 14px;font-size:13px;max-width:85%;margin-left:auto;">${msg.message}</div>
+    </div>`;
+  }
+  replies.forEach(r => {
+    const isAdmin = r.sender === 'admin';
+    html += `<div style="margin-bottom:16px;">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">${isAdmin ? '🟢 Lotex Support' : (ticket?.customer_name || 'You')} · ${new Date(r.created_at).toLocaleTimeString()}</div>
+      <div style="background:${isAdmin ? 'var(--card2)' : 'var(--orange)'};color:${isAdmin ? 'var(--text)' : '#000'};border-radius:${isAdmin ? '10px 10px 10px 2px' : '10px 10px 2px 10px'};padding:12px 14px;font-size:13px;max-width:85%;${isAdmin ? '' : 'margin-left:auto;'}">${r.body || r.content || ''}</div>
+    </div>`;
+  });
+  const wasAtBottom = thread.scrollHeight - thread.scrollTop <= thread.clientHeight + 50;
+  thread.innerHTML = html;
+  if (wasAtBottom) thread.scrollTop = thread.scrollHeight;
+
+  // Update support badge count (unread admin replies)
+  const unread = replies.filter(r => r.sender === 'admin').length;
+  updateSupportBadge(unread > 0 ? unread : null);
+}
+
+function updateSupportBadge(count) {
+  // Update bottom nav support badge
+  const bnSupport = document.getElementById('bn-support');
+  let badge = document.getElementById('support-badge');
+  if (count) {
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.id = 'support-badge';
+      badge.style.cssText = 'position:absolute;top:4px;right:10px;background:var(--orange);color:#000;border-radius:50%;width:16px;height:16px;font-size:9px;display:flex;align-items:center;justify-content:center;font-weight:800;';
+      if (bnSupport) { bnSupport.style.position = 'relative'; bnSupport.appendChild(badge); }
+    }
+    badge.textContent = count;
+  } else if (badge) {
+    badge.remove();
+  }
+}
+
+// Check for unread support replies on load
+async function checkSupportNotif() {
+  const ticketId = sessionStorage.getItem('lotex_support_ticket');
+  if (!ticketId) return;
+  const { data: replies } = await sb.from('support_replies').select('sender').eq('message_id', ticketId);
+  const adminReplies = (replies || []).filter(r => r.sender === 'admin').length;
+  if (adminReplies > 0) updateSupportBadge(adminReplies);
 }
 
 
@@ -3378,6 +3446,7 @@ checkSession();
 updateCartCount();
 loadFeatured();
 loadJustDropped();
+checkSupportNotif();
 // Handle page param from affiliate link
 (function() {
   const p = new URLSearchParams(window.location.search).get('page');
