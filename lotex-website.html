@@ -2823,8 +2823,9 @@ async function submitSupport() {
     </div>
     <div style="text-align:center;font-size:11px;color:var(--muted);padding:8px 0;">✅ Message sent — we'll reply shortly</div>`;
 
-  // Store ticket ID for replies
+  // Store ticket ID for replies and session persistence
   document.getElementById('support-reply-area').dataset.ticketId = data.id;
+  sessionStorage.setItem('lotex_support_ticket', data.id);
   toast('Message sent! We\'ll reply soon.', 'success');
 }
 
@@ -2856,7 +2857,13 @@ async function sendCustomerReply() {
 }
 
 function initSupportPage() {
-  // Reset form when navigating to support
+  // Check if there's an active ticket saved in session
+  const savedTicketId = sessionStorage.getItem('lotex_support_ticket');
+  if (savedTicketId) {
+    loadSupportThread(savedTicketId);
+    return;
+  }
+  // Fresh form
   document.getElementById('support-form-area').style.display = 'block';
   document.getElementById('support-thread').style.display = 'none';
   document.getElementById('support-reply-area').style.display = 'none';
@@ -2864,13 +2871,47 @@ function initSupportPage() {
   document.getElementById('support-email').value = '';
   document.getElementById('support-message').value = '';
   document.querySelectorAll('.prompt-chip').forEach(c => c.classList.remove('selected'));
-  // Pre-fill name if logged in
   if (currentUser) {
-    sb.from('profiles').select('full_name, email').eq('id', currentUser.id).single().then(({ data }) => {
+    sb.from('profiles').select('full_name').eq('id', currentUser.id).single().then(({ data }) => {
       if (data?.full_name) document.getElementById('support-name').value = data.full_name;
       if (currentUser.email) document.getElementById('support-email').value = currentUser.email;
     });
   }
+}
+
+async function loadSupportThread(ticketId) {
+  document.getElementById('support-form-area').style.display = 'none';
+  document.getElementById('support-thread').style.display = 'block';
+  document.getElementById('support-reply-area').style.display = 'block';
+  document.getElementById('support-reply-area').dataset.ticketId = ticketId;
+
+  const { data: ticket } = await sb.from('support_messages').select('*').eq('id', ticketId).single();
+  const { data: replies } = await sb.from('support_replies').select('*').eq('message_id', ticketId).order('created_at', { ascending: true });
+
+  const thread = document.getElementById('support-thread');
+  let html = '';
+
+  if (ticket) {
+    html += `<div style="margin-bottom:16px;">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">${ticket.customer_name} · ${new Date(ticket.created_at).toLocaleTimeString()}</div>
+      <div style="background:var(--orange);color:#000;border-radius:10px 10px 2px 10px;padding:12px 14px;font-size:13px;max-width:85%;margin-left:auto;">${ticket.message}</div>
+    </div>`;
+  }
+
+  (replies || []).forEach(r => {
+    const isAdmin = r.sender === 'admin';
+    html += `<div style="margin-bottom:16px;">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">${isAdmin ? '🟢 Lotex Support' : (ticket?.customer_name || 'You')} · ${new Date(r.created_at).toLocaleTimeString()}</div>
+      <div style="background:${isAdmin ? 'var(--card2)' : 'var(--orange)'};color:${isAdmin ? 'var(--text)' : '#000'};border-radius:${isAdmin ? '10px 10px 10px 2px' : '10px 10px 2px 10px'};padding:12px 14px;font-size:13px;max-width:85%;${isAdmin ? '' : 'margin-left:auto;'}">${r.content}</div>
+    </div>`;
+  });
+
+  if (!replies?.length) {
+    html += `<div style="text-align:center;font-size:11px;color:var(--muted);padding:8px 0;">✅ Message sent — we'll reply shortly</div>`;
+  }
+
+  thread.innerHTML = html;
+  thread.scrollTop = thread.scrollHeight;
 }
 
 
