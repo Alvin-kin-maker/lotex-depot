@@ -2804,7 +2804,6 @@ async function submitSupport() {
   const { data, error } = await sb.from('support_messages').insert({
     customer_name: name,
     customer_email: email || null,
-    customer_id: currentUser?.id || null,
     message: message,
     status: 'open'
   }).select().single();
@@ -3136,6 +3135,11 @@ checkSession();
 updateCartCount();
 loadFeatured();
 loadJustDropped();
+// Handle page param from affiliate link
+(function() {
+  const p = new URLSearchParams(window.location.search).get('page');
+  if (p === 'apply') showApply();
+})();
 
 </script>
 
