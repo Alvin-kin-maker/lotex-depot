@@ -2365,7 +2365,7 @@ async function updateAffiliateStatus(id, status, userId) {
 async function loadCustomers() {
   const tbody = document.getElementById('customers-tbody');
   const [{ data: customers }, { data: orders }] = await Promise.all([
-    sb.from('profiles').select('*').or('role.eq.customer,role.is.null').order('created_at', { ascending: false }),
+    sb.from('profiles').select('*').not('role', 'eq', 'admin').not('role', 'eq', 'affiliate').order('created_at', { ascending: false }),
     sb.from('orders').select('customer_id, total_amount, status, id, created_at, delivery_name, delivery_address, notes').order('created_at', { ascending: false })
   ]);
 
