@@ -1728,16 +1728,37 @@
 
     <!-- Edit form -->
     <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px;">
-      <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--orange);text-transform:uppercase;margin-bottom:20px;">Edit Profile</div>
-      <div style="margin-bottom:14px;">
-        <label style="display:block;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:7px;">Full Name</label>
-        <input id="profile-name-input" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;color:var(--text);font-family:'Montserrat',sans-serif;font-size:13px;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border)'">
+      <!-- View mode -->
+      <div id="profile-view-mode">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--orange);text-transform:uppercase;">Profile Info</div>
+          <button onclick="toggleProfileEdit(true)" style="background:none;border:1px solid var(--border);border-radius:6px;padding:6px 14px;color:var(--muted);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;cursor:pointer;touch-action:manipulation;">EDIT</button>
+        </div>
+        <div style="margin-bottom:10px;">
+          <div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;">Full Name</div>
+          <div id="profile-name-view" style="font-size:14px;font-weight:700;color:var(--text);">—</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;">Phone</div>
+          <div id="profile-phone-view" style="font-size:14px;font-weight:700;color:var(--text);">—</div>
+        </div>
       </div>
-      <div style="margin-bottom:14px;">
-        <label style="display:block;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:7px;">Phone Number</label>
-        <input id="profile-phone-input" type="tel" placeholder="+254..." style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;color:var(--text);font-family:'Montserrat',sans-serif;font-size:13px;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border)'">
+      <!-- Edit mode (hidden by default) -->
+      <div id="profile-edit-mode" style="display:none;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--orange);text-transform:uppercase;margin-bottom:20px;">Edit Profile</div>
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:7px;">Full Name</label>
+          <input id="profile-name-input" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;color:var(--text);font-family:'Montserrat',sans-serif;font-size:13px;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border)'">
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="display:block;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:7px;">Phone Number</label>
+          <input id="profile-phone-input" type="tel" placeholder="+254..." style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;color:var(--text);font-family:'Montserrat',sans-serif;font-size:13px;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border)'">
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button onclick="toggleProfileEdit(false)" style="flex:1;background:none;border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--muted);font-family:'Bebas Neue',cursive;font-size:14px;letter-spacing:1px;cursor:pointer;touch-action:manipulation;">CANCEL</button>
+          <button onclick="saveProfile()" style="flex:2;background:var(--orange);border:none;border-radius:8px;padding:12px;color:#000;font-family:'Bebas Neue',cursive;font-size:14px;letter-spacing:2px;cursor:pointer;touch-action:manipulation;">SAVE CHANGES</button>
+        </div>
       </div>
-      <button onclick="saveProfile()" style="width:100%;background:var(--orange);border:none;border-radius:8px;padding:13px;color:#000;font-family:'Bebas Neue',cursive;font-size:15px;letter-spacing:2px;cursor:pointer;touch-action:manipulation;">SAVE CHANGES</button>
     </div>
 
     <!-- Order stats -->
@@ -2860,6 +2881,9 @@ async function loadProfile() {
   document.getElementById('profile-role-display').innerHTML = profile?.role === 'affiliate'
     ? '<span style="background:rgba(255,107,0,0.15);color:var(--orange);font-size:10px;font-weight:700;letter-spacing:2px;padding:3px 10px;border-radius:20px;">AFFILIATE</span>'
     : '<span style="background:rgba(255,255,255,0.06);color:var(--muted);font-size:10px;font-weight:700;letter-spacing:2px;padding:3px 10px;border-radius:20px;">CUSTOMER</span>';
+  // Populate both view and edit fields
+  document.getElementById('profile-name-view').textContent = profile?.full_name || '—';
+  document.getElementById('profile-phone-view').textContent = profile?.phone || '—';
   document.getElementById('profile-name-input').value = profile?.full_name || '';
   document.getElementById('profile-phone-input').value = profile?.phone || '';
 
@@ -2917,6 +2941,11 @@ async function uploadAvatar(input) {
   toast('✅ Photo updated!', 'success');
 }
 
+function toggleProfileEdit(editing) {
+  document.getElementById('profile-view-mode').style.display = editing ? 'none' : 'block';
+  document.getElementById('profile-edit-mode').style.display = editing ? 'block' : 'none';
+}
+
 async function saveProfile() {
   const name = document.getElementById('profile-name-input').value.trim();
   const phone = document.getElementById('profile-phone-input').value.trim();
@@ -2926,13 +2955,27 @@ async function saveProfile() {
   if (error) { toast('Error saving: ' + error.message, 'error'); return; }
 
   toast('✅ Profile updated!', 'success');
-  // Refresh display
+
+  // Update view mode fields
   document.getElementById('profile-name-display').textContent = name;
-  const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
-  document.getElementById('profile-avatar-display').textContent = initials;
-  // Update nav button
-  const userBtn = document.querySelector('.user-btn .user-avatar');
-  if (userBtn) userBtn.textContent = initials;
+  document.getElementById('profile-name-view').textContent = name;
+  document.getElementById('profile-phone-view').textContent = phone || '—';
+
+  // Only update avatar initials if no photo is set
+  const avatarEl = document.getElementById('profile-avatar-display');
+  if (!avatarEl.querySelector('img')) {
+    const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
+    avatarEl.textContent = initials;
+    const navAvatar = document.querySelector('.user-btn .user-avatar');
+    if (navAvatar && !navAvatar.querySelector('img')) navAvatar.textContent = initials;
+  }
+
+  // Update nav name label
+  const nameLabel = document.querySelector('.user-btn .user-name-label');
+  if (nameLabel) nameLabel.textContent = name.split(' ')[0];
+
+  // Switch back to view mode
+  toggleProfileEdit(false);
 }
 
 
